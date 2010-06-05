@@ -1,3 +1,10 @@
+import time as t
+
+def time():
+    """
+    Platform independent time based on an integer seconds.
+    """
+    return int(t.time())
 
 class UnlockedAccessError(Exception):
     """

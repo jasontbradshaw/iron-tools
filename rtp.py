@@ -32,11 +32,8 @@ class RTPPlay(RTPTools):
             args = ["./%s" % self.path,
                     "-f", self.inputfile,
                     "-b", str(self.begintime),
-                    "-v",
                     "%s/%d" % (self.address, self.port),
-                    "1>", "/dev/null",    # no stdout
-                    "2>", "/dev/null",    # no stderr
-                    ]
+                   ]
 
             self.proc = sp.Popen(args)
         return self.pid()

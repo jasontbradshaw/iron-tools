@@ -38,7 +38,9 @@ class RTPPlay(RTPTools):
 
             # TODO: figure out how to pipe stderr crap properly w/o screwing up
             # our test.
-            self.proc = sp.Popen(args)
+            # TODO: close devnull?
+            DEVNULL = open('/dev/null', 'w')
+            self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         return self.pid()
 
 
@@ -70,5 +72,7 @@ class RTPDump(RTPTools):
             args.extend(["-o", self.outputfile])
             args.append("%s/%d" % (self.address, self.port))
             
-            self.proc = sp.Popen(args)
+            # TODO: close devnull?
+            DEVNULL = open('/dev/null', 'w')
+            self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         return self.pid()

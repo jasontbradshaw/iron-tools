@@ -29,13 +29,16 @@ class RTPPlay(RTPTools):
         self.path = path
 
     def start(self):
+        # TODO: block until in file appears
         if not self.proc or not self.isalive():
             args = ["./%s" % self.path,
                     "-f", self.inputfile,
                     "-b", str(self.begintime),
                     "%s/%d" % (self.address, self.port)]
 
-            self.proc = sp.Popen(args, stderr=sp.STDOUT, stdout=sp.PIPE)
+            # TODO: figure out how to pipe stderr crap properly w/o screwing up
+            # our test.
+            self.proc = sp.Popen(args)
         return self.pid()
 
 

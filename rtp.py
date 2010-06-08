@@ -1,5 +1,6 @@
 import subprocess as sp
 import datetime
+import os
 
 class RTPTools:
     def __init__(self):
@@ -29,13 +30,18 @@ class RTPPlay(RTPTools):
         self.path = path
 
     def start(self):
+        # TODO: block until in file appears
         if not self.proc or not self.isalive():
             args = ["./%s" % self.path,
                     "-f", self.inputfile,
                     "-b", str(self.begintime),
                     "%s/%d" % (self.address, self.port)]
 
-            self.proc = sp.Popen(args, stderr=sp.STDOUT, stdout=sp.PIPE)
+            # TODO: figure out how to pipe stderr crap properly w/o screwing up
+            # our test.
+            # TODO: close devnull?
+            DEVNULL = open(os.devnull, 'w')
+            self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         return self.pid()
 
 
@@ -67,5 +73,7 @@ class RTPDump(RTPTools):
             args.extend(["-o", self.outputfile])
             args.append("%s/%d" % (self.address, self.port))
             
-            self.proc = sp.Popen(args)
+            # TODO: close devnull?
+            DEVNULL = open(os.devnull, 'w')
+            self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         return self.pid()

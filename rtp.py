@@ -1,5 +1,5 @@
 import subprocess as sp
-from datetime import *
+import datetime
 
 class RTPTools:
     def __init__(self):
@@ -33,8 +33,7 @@ class RTPPlay(RTPTools):
             args = ["./%s" % self.path,
                     "-f", self.inputfile,
                     "-b", str(self.begintime),
-                    "%s/%d" % (self.address, self.port),
-                   ]
+                    "%s/%d" % (self.address, self.port)]
 
             self.proc = sp.Popen(args)
         return self.pid()
@@ -64,10 +63,9 @@ class RTPDump(RTPTools):
                     "-F", self.dumpformat]
             if not self.outputfile:
                 now = datetime.now()
-                self.outputfile = now.strftime("%Y-%m-%d-%H-%M-%S")
+                self.outputfile = now.strftime("%Y-%m-%d_%H-%M-%S.dump")
             args.extend(["-o", self.outputfile])
             args.append("%s/%d" % (self.address, self.port))
-
+            
             self.proc = sp.Popen(args)
         return self.pid()
-

@@ -1,5 +1,6 @@
 import subprocess as sp
 import datetime
+import os
 
 class RTPTools:
     def __init__(self):
@@ -39,7 +40,7 @@ class RTPPlay(RTPTools):
             # TODO: figure out how to pipe stderr crap properly w/o screwing up
             # our test.
             # TODO: close devnull?
-            DEVNULL = open('/dev/null', 'w')
+            DEVNULL = open(os.devnull, 'w')
             self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         return self.pid()
 
@@ -73,6 +74,6 @@ class RTPDump(RTPTools):
             args.append("%s/%d" % (self.address, self.port))
             
             # TODO: close devnull?
-            DEVNULL = open('/dev/null', 'w')
+            DEVNULL = open(os.devnull, 'w')
             self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         return self.pid()

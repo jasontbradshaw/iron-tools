@@ -21,7 +21,7 @@ def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
         print "outfile '%s' exists; removing." % outfile
         os.remove(outfile)
 
-    DEVNULL = open('/dev/null', 'w')
+    DEVNULL = open(os.devnull, 'w')
     play = rtp.RTPPlay('localhost', 9876, infile)
     dump = rtp.RTPDump('localhost', 9876, outfile)
     play2 = rtp.RTPPlay('localhost', 9000, outfile)

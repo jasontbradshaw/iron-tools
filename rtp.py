@@ -29,13 +29,13 @@ class RTPPlay(RTPTools):
         self.path = path
 
     def start(self):
-        if not self.proc:
+        if not self.proc or not self.isalive():
             args = ["./%s" % self.path,
                     "-f", self.inputfile,
                     "-b", str(self.begintime),
                     "%s/%d" % (self.address, self.port)]
 
-            self.proc = sp.Popen(args)
+            self.proc = sp.Popen(args, stderr=sp.STDOUT, stdout=sp.PIPE)
         return self.pid()
 
 
@@ -62,7 +62,7 @@ class RTPDump(RTPTools):
             args = ["./%s" % self.path,
                     "-F", self.dumpformat]
             if not self.outputfile:
-                now = datetime.now()
+                now = datetime.datetime.now()
                 self.outputfile = now.strftime("%Y-%m-%d_%H-%M-%S.dump")
             args.extend(["-o", self.outputfile])
             args.append("%s/%d" % (self.address, self.port))

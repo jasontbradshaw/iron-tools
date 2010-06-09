@@ -13,6 +13,31 @@ if os.uname()[0] == 'Darwin':
 elif os.uname()[0] == 'Linux':
     VLCCMD = VLCCMD_LINUX
 
+def vlcdumpplay_test(outfile='vlcdumpplay.dump'):
+    print 'begin vlcdumpplay test'
+    print 'i assume vlc is streaming a video to 127.0.0.1:9876'
+    print 'press [enter] if this is true'
+    raw_input()
+    DEVNULL = open(os.devnull, 'w')
+    dump = rtp.RTPDump('localhost', 9876, outfile)
+    play = rtp.RTPPlay('localhost', 9000, outfile)
+
+    print "dump pid:", dump.start()
+    time.sleep(2)
+    print "play pid:", play.start()
+    print "press [enter] to start 'vlc'"
+    raw_input()
+    args = [VLCCMD, 'rtp://@:9000']
+    vlc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+
+    print "press [enter] to quit"
+    raw_input()
+    dump.stop()
+    play.stop()
+    vlc.kill()
+    print 'done'
+
+
 def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
     print 'begin play-dump-play test.'
     print """
@@ -73,4 +98,11 @@ def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
     print 'done.'
 
 if __name__ == "__main__":
-    playdumpplay_test()
+    tests = [playdumpplay_test, vlcdumpplay_test]
+    s = ''
+    for i, t in enumerate(tests):
+        s += "[%d] %s\n" % (i, t.__name__)
+    s += "choose: "
+    choice = int(raw_input(s))
+
+    tests[choice]()

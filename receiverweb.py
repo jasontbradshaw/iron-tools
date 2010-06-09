@@ -21,6 +21,14 @@ glob = util.ThreadedDataStore()
 def hello():
     return "Receiver Web"
 
+# create play
+@app.route("/play")
+def play():
+    return None
+
+@app.route("/stop")
+def stop():
+
 @app.route("/get_file_list")
 def get_file_list():
     path = "" # TODO: specifiy path name

@@ -1,5 +1,5 @@
 import subprocess as sp
-import datetime
+import time
 import os
 
 class RTPTools:
@@ -13,28 +13,57 @@ class RTPTools:
         pass
 
     def stop(self):
+        """
+        Kills the process launched by 'start'.
+        """
+        
         self.proc.terminate()
 
     def pid(self):
+        """
+        Returns the process identifier of the process started by 'start'.
+        """
+        
         return self.proc.pid
 
 class RTPPlay(RTPTools):
-    def __init__(self, address, port, inputfile=None, begintime=0,
+    """
+    Streams an RTP dump file to a network address.
+    """
+    
+    def __init__(self, address, port, inputfile=None, starttime=0,
             path='rtpplay'):
+        """
+        Builds an RTPPlay object.
+          address: ip address to play stream to
+          port: port number of stream to play to (must be even)
+          inputfile: rtpdump-generated file to play from
+          starttime: file time to begin playing the file from
+          path: path to rtpplay binary
+        """
+        
         self.proc = None
 
         self.address = address
         self.port = port
         self.inputfile = inputfile
-        self.begintime = begintime
+        self.starttime = starttime
         self.path = path
 
     def start(self):
-        # TODO: block until in file appears
+        """
+        Start the rtpplay process with the paramters we were created with.
+        """
+        
+        # make sure file exists before running rtpplay
+        if not os.path.isfile(self.inputfile):
+            raise IOError("Input file not found.")
+
+        # only launch if process isn't already running or isn't alive
         if not self.proc or not self.isalive():
             args = ["./%s" % self.path,
                     "-f", self.inputfile,
-                    "-b", str(self.begintime),
+                    "-b", str(self.starttime),
                     "%s/%d" % (self.address, self.port)]
 
             # TODO: figure out how to pipe stderr crap properly w/o screwing up
@@ -42,10 +71,14 @@ class RTPPlay(RTPTools):
             # TODO: close devnull?
             DEVNULL = open(os.devnull, 'w')
             self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+        
         return self.pid()
 
-
 class RTPDump(RTPTools):
+    """
+    Dumps an RTP stream to a file.
+    """
+    
     # TODO:
     # - allow user to append to existing file
     # - backup files
@@ -64,16 +97,26 @@ class RTPDump(RTPTools):
         self.path = path
 
     def start(self):
+        """
+        Launches an rtpdump process with the already specified parameters.
+        """
+        
+        # only launch if no process exists.
         if not self.proc:
-            args = ["./%s" % self.path,
-                    "-F", self.dumpformat]
+            
+            # timestamp the file if no file name was specified
             if not self.outputfile:
-                now = datetime.datetime.now()
-                self.outputfile = now.strftime("%Y-%m-%d_%H-%M-%S.dump")
-            args.extend(["-o", self.outputfile])
-            args.append("%s/%d" % (self.address, self.port))
+                tm = time.strftime("%Y-%m-%d_%H-%M-%S.dump")
+            else:
+                tm = self.outputfile
+            
+            args = ["./%s" % self.path,
+                    "-F", self.dumpformat,
+                    "-o", tm,
+                    "%s/%d" % (self.address, self.port)]
             
             # TODO: close devnull?
             DEVNULL = open(os.devnull, 'w')
             self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+        
         return self.pid()

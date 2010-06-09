@@ -28,6 +28,7 @@ def play():
 
 @app.route("/stop")
 def stop():
+    return None
 
 @app.route("/get_file_list")
 def get_file_list():

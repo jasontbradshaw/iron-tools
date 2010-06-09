@@ -21,11 +21,9 @@ class RTPTools:
         Kills the process launched by 'start'.
         """
         
-        # we can only die once
-        try:
-            self.proc.terminate()
-        except OSError:
-            pass
+        if not self.isalive():
+            return
+        self.proc.terminate()
 
     def pid(self):
         """

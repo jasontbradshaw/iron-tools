@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import flask
+import os
 from flask import Flask
 from flask import flash
 
@@ -10,7 +11,7 @@ import util
 --WHITEBOARD--
 get_file_list -> json[]
 play_file(file_name)
-get_status -> json
+get_status -> json (i.e. downloading,startime)
 """
 
 app = Flask(__name__)
@@ -22,7 +23,12 @@ def hello():
 
 @app.route("/get_file_list")
 def get_file_list():
-    return None
+    path = "" # TODO: specifiy path name
+    if os.path.exists(path):
+        dirList = os.listdir(path)
+    else:
+        dirList = []
+    return flask.jsonify(file_list = dirList)
 
 @app.route("/play_file")
 def play_file(file_name):
@@ -33,4 +39,5 @@ def get_status():
     return None
 
 if __name__ == "__main__":
+    app.secret_key = "replace me as well!"
     app.run(debug = True)

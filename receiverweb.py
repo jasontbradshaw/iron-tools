@@ -16,12 +16,12 @@ def hello():
 # create play
 @app.route("/play")
 def play():
-    return null
+    return None
 
 # Creat stop
 @app.route("/stop")
 def stop():
-    return null
+    return None
 
 if __name__ == "__main__":
     app.run(debug = True)

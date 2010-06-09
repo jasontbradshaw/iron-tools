@@ -1,29 +1,37 @@
 import subprocess as sp
+import threading
 import time
 import os
 
 class RTPTools:
     def __init__(self):
         self.proc = None
+        self.lock = threading.Lock()
 
     def isalive(self):
         return self.proc.poll() is None
 
     def start(self):
-        pass
+        raise NotImplementedError("start not implemented")
 
     def stop(self):
         """
         Kills the process launched by 'start'.
         """
         
-        self.proc.terminate()
+        # we can only die once
+        try:
+            self.proc.terminate()
+        except OSError:
+            pass
 
     def pid(self):
         """
         Returns the process identifier of the process started by 'start'.
         """
         
+        if not self.proc:
+            return None
         return self.proc.pid
 
 class RTPPlay(RTPTools):
@@ -40,6 +48,8 @@ class RTPPlay(RTPTools):
           starttime: file time to begin playing the file from
           path: path to rtpplay binary
         """
+
+        RTPTools.__init__(self)
         
         self.proc = None
 
@@ -54,22 +64,23 @@ class RTPPlay(RTPTools):
         Start the rtpplay process with the paramters we were created with.
         """
         
-        # make sure file exists before running rtpplay
-        if not os.path.isfile(self.inputfile):
-            raise IOError("Input file not found.")
+        with self.lock:
+            # make sure file exists before running rtpplay
+            if not os.path.isfile(self.inputfile):
+                raise IOError("Input file not found.")
 
-        # only launch if process isn't already running or isn't alive
-        if not self.proc or not self.isalive():
-            args = ["./%s" % self.path,
-                    "-f", self.inputfile,
-                    "-b", str(self.starttime),
-                    "%s/%d" % (self.address, self.port)]
+            # only launch if process isn't already running or isn't alive
+            if not self.proc or not self.isalive():
+                args = ["./%s" % self.path,
+                        "-f", self.inputfile,
+                        "-b", str(self.starttime),
+                        "%s/%d" % (self.address, self.port)]
 
-            # TODO: figure out how to pipe stderr crap properly w/o screwing up
-            # our test.
-            # TODO: close devnull?
-            DEVNULL = open(os.devnull, 'w')
-            self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+                # TODO: figure out how to pipe stderr crap properly w/o screwing up
+                # our test.
+                # TODO: close devnull?
+                DEVNULL = open(os.devnull, 'w')
+                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         
         return self.pid()
 
@@ -87,6 +98,9 @@ class RTPDump(RTPTools):
 
     def __init__(self, address, port, outputfile=None, dumpformat='dump',
             path='rtpdump'):
+
+        RTPTools.__init__(self)
+
         self.proc = None
 
         self.address = address

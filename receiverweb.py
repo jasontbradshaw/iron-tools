@@ -40,7 +40,7 @@ def play_file(file_name):
     ip_address = None # TODO: specify ip address
     play = rtp.RTPPlay('localhost', ip_address, file_name)
     if not play.isalive():
-        return None # TODO: do not try to play
+        return flask.jsonify(error="RTPPlay is not alive")
     play.start()
     return flask.jsonify()
 

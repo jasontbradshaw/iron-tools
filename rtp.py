@@ -114,22 +114,23 @@ class RTPDump(RTPTools):
         Launches an rtpdump process with the already specified parameters.
         """
         
-        # only launch if no process exists.
-        if not self.proc:
-            
-            # timestamp the file if no file name was specified
-            if not self.outputfile:
-                tm = time.strftime("%Y-%m-%d_%H-%M-%S.dump")
-            else:
-                tm = self.outputfile
-            
-            args = ["./%s" % self.path,
-                    "-F", self.dumpformat,
-                    "-o", tm,
-                    "%s/%d" % (self.address, self.port)]
-            
-            # TODO: close devnull?
-            DEVNULL = open(os.devnull, 'w')
-            self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+        with self.lock:
+            # only launch if no process exists.
+            if not self.proc:
+                
+                # timestamp the file if no file name was specified
+                if not self.outputfile:
+                    tm = time.strftime("%Y-%m-%d_%H-%M-%S.dump")
+                else:
+                    tm = self.outputfile
+                
+                args = ["./%s" % self.path,
+                        "-F", self.dumpformat,
+                        "-o", tm,
+                        "%s/%d" % (self.address, self.port)]
+                
+                # TODO: close devnull?
+                DEVNULL = open(os.devnull, 'w')
+                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
         
         return self.pid()

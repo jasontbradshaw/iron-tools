@@ -1,4 +1,5 @@
 import time as t
+import threading
 
 def time():
     """
@@ -21,21 +22,16 @@ class ThreadedDataStore:
         but is thread-safe.
         """
         
-        try:
-            import threading
-        except ImportError:
-            import dummy_threading as threading
-        
         # the dict we slap thread safety onto
         self.__dict = {}
         self.__default = None
         
-        self.__lock = threading.RLock()
+        self.__lock = threading.Lock()
         self.__locked = False
     
     def __enter__(self):
-        self.__lock.acquire()
         self.__locked = True
+        self.__lock.acquire()
     
     def __exit__(self, typ = None, val = None, trace = None):
         self.__lock.release()

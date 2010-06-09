@@ -2,6 +2,7 @@ import os
 import os.path
 import rtp
 import subprocess as sp
+import time
 
 
 VLCCMD_OSX = '/Applications/VLC.app/Contents/MacOS/VLC'
@@ -14,6 +15,12 @@ elif os.uname()[0] == 'Linux':
 
 def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
     print 'begin play-dump-play test.'
+    print """
++---------+                 ###########                 ###########
+|original | ==============> # rtpdump # =============>  #   vlc   #
+|dump     |    rtpplay      ###########    rtpplay      ###########
++---------+    @:9876                      @:9000
+"""
 
     if not os.path.isfile(infile):
         print "infile '%s' does not exist. done." % infile
@@ -27,15 +34,11 @@ def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
     play2 = rtp.RTPPlay('localhost', 9000, outfile)
 
     print 'instantiated objects'
-
-    print "press [enter] to start 'play'"
-    raw_input()
+    time.sleep(1)
     print "play pid:", play.start()
-    print "press [enter] to start 'dump'"
-    raw_input()
+    time.sleep(2)
     print "dump pid:", dump.start()
-    print "press [enter] to start 'play2'"
-    raw_input()
+    time.sleep(2)
     print "play2 pid:", play2.start()
     print "press [enter] to start 'vlc'"
     raw_input()
@@ -55,10 +58,13 @@ def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
     play.stop()
     dump.stop()
     play2.stop()
-    vlc.kill()
-    print "killed processes"
-    print "press [enter] to end"
-    raw_input()
+    try:
+        vlc.kill()
+    except:
+        print "failed to kill vlc. oh well."
+
+    print "killing processes"
+    time.sleep(2)
 
     print 'play  alive:', play.isalive()
     print 'dump  alive:', dump.isalive()

@@ -9,6 +9,8 @@ class RTPTools:
         self.lock = threading.Lock()
 
     def isalive(self):
+        if not self.proc:
+            return False
         return self.proc.poll() is None
 
     def start(self):
@@ -70,7 +72,7 @@ class RTPPlay(RTPTools):
                 raise IOError("Input file not found.")
 
             # only launch if process isn't already running or isn't alive
-            if not self.proc or not self.isalive():
+            if not self.isalive():
                 args = ["./%s" % self.path,
                         "-f", self.inputfile,
                         "-b", str(self.starttime),
@@ -96,7 +98,7 @@ class RTPDump(RTPTools):
     #   - kill it.
     #   - what about the existing file? TODO.
 
-    def __init__(self, address, port, outputfile=None, dumpformat='dump',
+    def __init__(self, address='localhost', port=9876, outputfile=None, dumpformat='dump',
             path='rtpdump'):
 
         RTPTools.__init__(self)
@@ -116,7 +118,7 @@ class RTPDump(RTPTools):
         
         with self.lock:
             # only launch if no process exists.
-            if not self.proc:
+            if not self.isalive():
                 
                 # timestamp the file if no file name was specified
                 if not self.outputfile:

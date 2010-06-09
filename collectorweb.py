@@ -6,9 +6,11 @@ from flask import flash
 
 import util
 import time
+import rtp
 
 app = Flask(__name__)
 glob = util.ThreadedDataStore()
+rtpdump = rtp.RTPDump()
 
 @app.route("/")
 def hello():
@@ -19,6 +21,17 @@ def start_record():
     # save the time we started recording for permanence
     with glob:
         glob["start_time"] = util.time()
+
+        if rtpdump.isalive():
+            return flask.jsonify(warning="rtpplay already running.")
+
+        try:
+            rtpdump.start()
+            if not rtpdump.isalive():
+                raise Exception("Failed to start rtpdump.")
+        except Exception as e:
+            return flask.jsonify(error=str(e))
+
         
         # make the time prettier
         string_time = time.asctime(time.localtime(glob["start_time"]))
@@ -28,7 +41,8 @@ def start_record():
 
 @app.route("/stop_record")
 def stop_record():
-    raise NotImplementedError("Method not implemented yet.")
+    rtpdump.stop()
+    return flask.jsonify()
 
 @app.route("/get_elapsed_time")
 def get_elapsed_time():

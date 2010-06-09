@@ -31,8 +31,7 @@ class RTPPlay(RTPTools):
     Streams an RTP dump file to a network address.
     """
     
-    def __init__(self, address, port, inputfile=None, starttime=0,
-            path='rtpplay'):
+    def __init__(self, address, port, inputfile, starttime=0, path='rtpplay'):
         """
         Builds an RTPPlay object.
           address: ip address to play stream to

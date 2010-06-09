@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import flask
+import rtp
 import os
 from flask import Flask
 from flask import flash
@@ -21,27 +22,27 @@ glob = util.ThreadedDataStore()
 def hello():
     return "Receiver Web"
 
-# create play
-@app.route("/play")
-def play():
-    return None
-
 @app.route("/stop")
 def stop():
     return None
 
 @app.route("/get_file_list")
 def get_file_list():
-    path = "" # TODO: specifiy path name
+    path = "" # TODO: specify path name
     if os.path.exists(path):
         dirList = os.listdir(path)
     else:
         dirList = []
     return flask.jsonify(file_list = dirList)
 
-@app.route("/play_file")
+@app.route("/play_file/<string:file_name>")
 def play_file(file_name):
-    return None
+    ip_address = None # TODO: specify ip address
+    play = rtp.RTPPlay('localhost', ip_address, file_name)
+    if not play.isalive():
+        return None # TODO: do not try to play
+    play.start()
+    return flask.jsonify()
 
 @app.route("/get_status")
 def get_status():

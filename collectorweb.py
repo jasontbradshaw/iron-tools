@@ -96,6 +96,8 @@ def commit_time(t):
     with glob:
         glob["commit_time"] = t
     
+    # TODO: write commit time to a file
+    
     return flask.jsonify()
 
 @app.route("/get_commit_time")
@@ -135,6 +137,4 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(debug = True, port=4000)
-
-
+    app.run(debug = True, port=5000)

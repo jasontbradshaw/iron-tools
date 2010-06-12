@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import flask
-import rtp
 import os
+
+import flask
 from flask import Flask
-from flask import flash
 
 import util
+import rtp
 
 """
 --WHITEBOARD--
@@ -46,12 +46,16 @@ def get_file_list():
     Returns a list of files found in the dump directory.
     """
     
-    path = "" # TODO: specify path name
+    # try to fill the list with files in the given path
+    path = os.path.join(SYNC_DIR, "dump")
     dirlist = []
     if os.path.exists(path):
-        dirList = os.listdir(path)
+        dirlist = os.listdir(path)
     
-    return flask.jsonify(file_list=dirList)
+    # sort directories before returning
+    dirlist.sort()
+    
+    return flask.jsonify(file_list=dirlist)
 
 @app.route("/play_file/<file_name>")
 def play_file(file_name):

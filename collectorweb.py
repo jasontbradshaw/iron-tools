@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+import os
+
 import flask
 from flask import Flask
 
 import util
 import rtp
-import os
 
 app = Flask(__name__)
 
@@ -51,7 +52,7 @@ def start_record():
     
     # try to start it, but return an error if it doesn't succeed
     try:
-        rtpdump.start("test.dump", RTPDUMP_ADDRESS, RTPDUMP_PORT)
+        rtpdump.start(os.path.join(SYNC_DIR, "test.dump"), RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:

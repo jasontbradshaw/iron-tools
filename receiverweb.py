@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import flask
-import os
-
-from flask import Flask
-
 import rtp
+import os
+from flask import Flask
+from flask import flash
+
 import util
 
 """
@@ -16,38 +16,17 @@ get_status -> json (i.e. downloading,startime)
 """
 
 app = Flask(__name__)
-
-# always use 'with' to access data store's data!
 glob = util.ThreadedDataStore()
-
-rtpplay = rtp.RTPPlay('localhost', 9000, "dummy.dump")
+rtpplay = rtp.RTPPlay()
 
 @app.route("/")
 def hello():
     return "Receiver Web"
 
-@app.route("/play_file")
-def play_file(file_name):
-    """
-    Plays the given file.
-    """
-    
-    rtpplay.address = None # TODO: specify ip address
-    rtpplay.inputfile = file_name
-    if not rtpplay.isalive():
-        return flask.jsonify(error = "rtplay is not alive")
-    
-    # can't paly a file if rtpplay isn't working
-    if not rtpplay.isalive():
-        return flask.jsonify(error="rtp is not alive")
-    
-    rtpplay.start()
-    return flask.jsonify()
-
-@app.route("/stop_playback")
+@app.route("/stop")
 def stop():
     if not rtpplay.isalive():
-        return flask.jsonify(error="rtp is not alive")
+        return flask.jsonify(error = "rtp is not alive")
     rtpplay.stop()
     return flask.jsonify()
 
@@ -60,8 +39,12 @@ def get_file_list():
         dirList = []
     return flask.jsonify(file_list = dirList)
 
-@app.route("/load_file/<file_name>")
-def load_file(file_name):
+@app.route("/play_file/<string:file_name>")
+def play_file(file_name):
+    rtpplay.start(file_name, 'localhost', 9000)
+    if not rtpplay.isalive():
+        return flask.jsonify(error = "rtplay is not alive")
+    rtpplay.start()
     return flask.jsonify()
 
 @app.route("/get_status")

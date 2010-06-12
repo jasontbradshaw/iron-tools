@@ -22,6 +22,7 @@ rtpplay = rtp.RTPPlay()
 # config variables
 RTPPLAY_ADDRESS = "localhost"
 RTPPLAY_PORT = 9000
+SYNC_DIR = "receiver/"
 
 @app.route("/")
 def hello():
@@ -82,4 +83,4 @@ def get_status():
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"
-    app.run(debug = True)
+    app.run(debug=True)

@@ -101,7 +101,6 @@ class RTPDump(RTPTools):
         self.path = path
         
         self.proc = None
-        self.outputfile = ''
 
     def start(self, outputfile, address, port, dump_format="dump"):
         """
@@ -120,6 +119,5 @@ class RTPDump(RTPTools):
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')
                 self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
-                self.outputfile = outputfile
         
         return self.pid()

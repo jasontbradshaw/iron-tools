@@ -23,6 +23,9 @@ RTPDUMP_PORT = 9876
 RTPPLAY_PREVIEW_ADDRESS = "localhost"
 RTPPLAY_PREVIEW_PORT = 10000
 
+# location that gets rsync'ed with receivers
+SYNC_DIR = "collector/"
+
 """
 Conventions:
   - Returning the empty JSON object {} signifies success.
@@ -99,8 +102,9 @@ def commit_time(t=None):
         with glob:
             glob["commit_time"] = t
         
-        # TODO: write commit time to a file
-        
+        # write the commit time to file
+        with open(os.path.join(SYNC_DIR, "commit_time"), 'w') as f:
+            f.write(str(t))
     else:
         # return it if its there, otherwise return 0
         with glob:
@@ -116,7 +120,7 @@ def commit_time(t=None):
 @app.route("/play_preview/<int:start_time>/<int:duration>")
 def play_preview(start_time, duration=30):
     """
-    RTPPlay duration seconds of the current dump starting at time t.
+    RTPPlay duration seconds of the current dump starting at time start_time.
     """
 
     # ensure the file exists

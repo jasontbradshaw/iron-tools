@@ -13,10 +13,14 @@ glob = util.ThreadedDataStore()
 
 # these do the playing and recording
 rtpdump = rtp.RTPDump()
+rtpplay = rtp.RTPPlay()
 
 # config variables
 RTPDUMP_ADDRESS = "localhost"
 RTPDUMP_PORT = 9876
+
+RTPPLAY_PREVIEW_ADDRESS = "localhost"
+RTPPLAY_PREVIEW_PORT = 10000
 
 """
 Conventions:
@@ -37,9 +41,9 @@ def start_record():
     with glob:
         glob["start_time"] = util.time()
     
-    # if rtpplay is already started, return
+    # if rtpdump is already started, return
     if rtpdump.isalive():
-        return flask.jsonify(warning="rtpplay already running.")
+        return flask.jsonify(warning="rtpdump already running.")
     
     # try to start it, but return an error if it doesn't succeed
     try:
@@ -106,6 +110,29 @@ def get_commit_time():
         else:
             return flask.jsonify(commit_time=0)
 
+@app.route("/play_preview/<int:start_time>")
+@app.route("/play_preview/<int:start_time>/<int:duration>")
+def play_preview(start_time, duration=30):
+    """
+    RTPPlay duration seconds of the current dump starting at time t.
+    """
+
+    # ensure the file exists
+    if not os.path.exists(rtpdump.outfile):
+        return flask.jsonify(error="Could not find file '%s'." % rtpdump.outfile)
+    
+    # attempt to play the given file
+    rtpplay.start(rtpdump.outfile, RTPPLAY_PREVIEW_ADDRESS,
+            RTPPLAY_PREVIEW_PORT, start_time=start_time,
+            end_time=start_time+duration)
+    
+    if not rtpplay.isalive():
+        return flask.jsonify(error="rtpplay is not alive")
+    
+    return flask.jsonify()
+
 if __name__ == "__main__":
     app.secret_key = "replace me!"
     app.run(debug = True)
+
+

@@ -52,7 +52,7 @@ class RTPPlay(RTPTools):
         self.path = path
         self.proc = None
 
-    def start(self, inputfile, address, port, start_time=0):
+    def start(self, inputfile, address, port, start_time=0, end_time=None):
         """
         Start the rtpplay process with a file to play, an address, then port
         to play to, and optionally a time to start playing the stream from.
@@ -67,8 +67,10 @@ class RTPPlay(RTPTools):
             if not self.isalive():
                 args = ["./%s" % self.path,
                         "-f", inputfile,
-                        "-b", str(start_time),
-                        "%s/%d" % (address, port)]
+                        "-b", str(start_time),]
+                if end_time:
+                    args.extend(["-e", str(end_time)])
+                args.extend(["%s/%d" % (address, port)])
                 
                 # TODO: figure out how to pipe stderr crap properly w/o
                 # screwing up our test.
@@ -97,7 +99,8 @@ class RTPDump(RTPTools):
         self.path = path
         
         self.proc = None
-    
+        self.outputfile = ''
+
     def start(self, address, port, dump_format="dump", outputfile=None):
         """
         Launches an rtpdump process with the already specified parameters.
@@ -121,5 +124,6 @@ class RTPDump(RTPTools):
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')
                 self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+                self.outputfile = outputfile
         
         return self.pid()

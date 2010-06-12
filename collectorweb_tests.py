@@ -27,7 +27,7 @@ class CollectorWebTestCase(unittest.TestCase):
         assert '{}' in rv.data
 
         rv = self.app.get('/start_record')
-        assert 'error' in rv.data
+        assert 'warning' in rv.data
 
         rv = self.app.get('/stop_record')
         assert '{}' in rv.data

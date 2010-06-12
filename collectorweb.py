@@ -21,11 +21,15 @@ rtpplay = rtp.RTPPlay()
 RTPDUMP_ADDRESS = "localhost"
 RTPDUMP_PORT = 9876
 
+# where dump preview gets sent
 RTPPLAY_PREVIEW_ADDRESS = "localhost"
 RTPPLAY_PREVIEW_PORT = 10000
 
 # location that gets rsync'ed with receivers
 SYNC_DIR = "collector/"
+
+# name of the video file to dump to
+VIDEO_BASENAME = "sermon"
 
 """
 Conventions:
@@ -52,7 +56,8 @@ def start_record():
     
     # try to start it, but return an error if it doesn't succeed
     try:
-        rtpdump.start(os.path.join(SYNC_DIR, "test.dump"), RTPDUMP_ADDRESS, RTPDUMP_PORT)
+        fname = os.path.join(SYNC_DIR, VIDEO_BASENAME)
+        rtpdump.start(fname, RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:

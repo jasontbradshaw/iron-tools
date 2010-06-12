@@ -13,6 +13,8 @@ glob = util.ThreadedDataStore()
 
 # these do the playing and recording
 rtpdump = rtp.RTPDump()
+
+# config variables
 RTPDUMP_ADDRESS = "localhost"
 RTPDUMP_PORT = 9876
 

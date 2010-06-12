@@ -13,6 +13,8 @@ glob = util.ThreadedDataStore()
 
 # these do the playing and recording
 rtpdump = rtp.RTPDump()
+RTPDUMP_ADDRESS = "localhost"
+RTPDUMP_PORT = 9876
 
 """
 Conventions:
@@ -39,7 +41,7 @@ def start_record():
     
     # try to start it, but return an error if it doesn't succeed
     try:
-        rtpdump.start()
+        rtpdump.start(RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:

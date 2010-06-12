@@ -42,9 +42,10 @@ def get_file_list():
 @app.route("/play_file/<string:file_name>")
 def play_file(file_name):
     rtpplay.start(file_name, 'localhost', 9000)
+    
     if not rtpplay.isalive():
         return flask.jsonify(error = "rtplay is not alive")
-    rtpplay.start()
+    
     return flask.jsonify()
 
 @app.route("/get_status")

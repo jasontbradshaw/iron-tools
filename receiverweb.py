@@ -16,13 +16,16 @@ get_status -> json (i.e. downloading,startime)
 """
 
 app = Flask(__name__)
-glob = util.ThreadedDataStore()
+#glob = util.ThreadedDataStore()
 rtpplay = rtp.RTPPlay()
 
 # config variables
 RTPPLAY_ADDRESS = "localhost"
-RTPPLAY_PORT = 9000
+RTPPLAY_PORT = 9002
+
 SYNC_DIR = "receiver/"
+DUMP_DIR = os.path.join(SYNC_DIR, "dump")
+COMMIT_FILE = os.path.join(SYNC_DIR, "commit_time")
 
 @app.route("/")
 def hello():
@@ -47,29 +50,64 @@ def get_file_list():
     """
     
     # try to fill the list with files in the given path
-    path = os.path.join(SYNC_DIR, "dump")
     dirlist = []
-    if os.path.exists(path):
-        dirlist = os.listdir(path)
+    if os.path.exists(DUMP_DIR):
+        dirlist = os.listdir(DUMP_DIR)
     
     # sort directories before returning
     dirlist.sort()
     
     return flask.jsonify(file_list=dirlist)
 
+@app.route("/commit_time")
+def commit_time():
+    """
+    Returns the current commit time found in the sync directory.
+    """
+    
+    # attempt to read commit time from file
+    commit_time = 0
+    try:
+        with open(COMMIT_FILE, 'r') as f:
+            commit_time = int(f.read())
+    except ValueError:
+        return flask.jsonify(error="Non-integer commit time.")
+    except IOError:
+        # no file means start from 0
+        pass
+    
+    return flask.jsonify(commit_time=commit_time)
+
 @app.route("/play_file/<file_name>")
 def play_file(file_name):
     """
     Attempts to play the file argument.  Returns success if it could find
-    the file, otherwise an error.
+    the file and was not already playing, otherwise an error.
     """
-
+    
+    # don't play again if already running
+    if rtpplay.isalive():
+        return flask.jsonify(warning="rtpplay already running.")
+    
+    path = os.path.join(DUMP_DIR, file_name)
+    
     # ensure the file exists
-    if not os.path.exists(file_name):
+    if not os.path.isfile(path):
         return flask.jsonify(error="Could not find file '%s'." % file_name)
     
+    # try to get the commit time from file
+    commit_time = 0
+    try:
+        with open(COMMIT_FILE, 'r') as f:
+            commit_time = int(f.read())
+    except ValueError:
+        return flask.jsonify(error="Non-integer commit time.")
+    except IOError:
+        # if there's no file, start from 0
+        pass
+    
     # attempt to play the given file
-    rtpplay.start(file_name, RTPPLAY_ADDRESS, RTPPLAY_PORT)
+    rtpplay.start(path, RTPPLAY_ADDRESS, RTPPLAY_PORT, start_time=commit_time)
     
     if not rtpplay.isalive():
         return flask.jsonify(error="rtpplay is not alive")
@@ -83,7 +121,7 @@ def get_status():
     """
     
     # TODO: implement status reporting
-    return flask.jsonify()
+    return flask.jsonify(playing=rtpplay.isalive())
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"

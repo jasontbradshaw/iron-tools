@@ -5,6 +5,7 @@ from flask import Flask
 
 import util
 import rtp
+import os
 
 app = Flask(__name__)
 
@@ -118,11 +119,12 @@ def play_preview(start_time, duration=30):
     """
 
     # ensure the file exists
-    if not os.path.exists(rtpdump.outfile):
-        return flask.jsonify(error="Could not find file '%s'." % rtpdump.outfile)
+    if not os.path.exists(rtpdump.outputfile):
+        return flask.jsonify(error="Could not find file '%s'." %
+                rtpdump.outputfile)
     
     # attempt to play the given file
-    rtpplay.start(rtpdump.outfile, RTPPLAY_PREVIEW_ADDRESS,
+    rtpplay.start(rtpdump.outputfile, RTPPLAY_PREVIEW_ADDRESS,
             RTPPLAY_PREVIEW_PORT, start_time=start_time,
             end_time=start_time+duration)
     
@@ -133,6 +135,6 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(debug = True)
+    app.run(debug = True, port=4000)
 
 

@@ -39,45 +39,39 @@ class RTPPlay(RTPTools):
     Streams an RTP dump file to a network address.
     """
     
-    def __init__(self, address, port, inputfile, starttime=0, path='rtpplay'):
+    def __init__(self, path='rtpplay'):
         """
-        Builds an RTPPlay object.
-          address: ip address to play stream to
-          port: port number of stream to play to (must be even)
-          inputfile: rtpdump-generated file to play from
-          starttime: file time to begin playing the file from
-          path: path to rtpplay binary
+        Builds an RTPPlay object, optionally with the path to the binary
+        rtpplay file.
         """
 
+        # init parent for its precious methodly fluids
         RTPTools.__init__(self)
         
+        # path to 'rtpplay' binary
+        self.path = path
         self.proc = None
 
-        self.address = address
-        self.port = port
-        self.inputfile = inputfile
-        self.starttime = starttime
-        self.path = path
-
-    def start(self):
+    def start(self, inputfile, address, port, start_time=0):
         """
-        Start the rtpplay process with the paramters we were created with.
+        Start the rtpplay process with a file to play, an address, then port
+        to play to, and optionally a time to start playing the stream from.
         """
         
         with self.lock:
             # make sure file exists before running rtpplay
-            if not os.path.isfile(self.inputfile):
-                raise IOError("Input file not found.")
+            if not os.path.isfile(inputfile):
+                raise IOError("Input file '%s' not found." % inputfile)
 
             # only launch if process isn't already running or isn't alive
             if not self.isalive():
                 args = ["./%s" % self.path,
-                        "-f", self.inputfile,
-                        "-b", str(self.starttime),
-                        "%s/%d" % (self.address, self.port)]
-
-                # TODO: figure out how to pipe stderr crap properly w/o screwing up
-                # our test.
+                        "-f", inputfile,
+                        "-b", str(start_time),
+                        "%s/%d" % (address, port)]
+                
+                # TODO: figure out how to pipe stderr crap properly w/o
+                # screwing up our test.
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')
                 self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
@@ -96,20 +90,15 @@ class RTPDump(RTPTools):
     #   - kill it.
     #   - what about the existing file? TODO.
 
-    def __init__(self, address='localhost', port=9876, outputfile=None, dumpformat='dump',
-            path='rtpdump'):
-
+    def __init__(self, path='rtpdump'):
         RTPTools.__init__(self)
-
-        self.proc = None
-
-        self.address = address
-        self.port = port
-        self.dumpformat = dumpformat
-        self.outputfile = outputfile
+        
+        # path to 'rtpdump' binary
         self.path = path
-
-    def start(self):
+        
+        self.proc = None
+    
+    def start(self, address, port, dump_format="dump", outputfile=None):
         """
         Launches an rtpdump process with the already specified parameters.
         """
@@ -119,15 +108,15 @@ class RTPDump(RTPTools):
             if not self.isalive():
                 
                 # timestamp the file if no file name was specified
-                if not self.outputfile:
+                if not outputfile:
                     tm = time.strftime("%Y-%m-%d_%H-%M-%S.dump")
                 else:
-                    tm = self.outputfile
+                    tm = outputfile
                 
                 args = ["./%s" % self.path,
-                        "-F", self.dumpformat,
+                        "-F", dump_format,
                         "-o", tm,
-                        "%s/%d" % (self.address, self.port)]
+                        "%s/%d" % (address, port)]
                 
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')

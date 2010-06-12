@@ -16,7 +16,7 @@ class CollectorWebTestCase(unittest.TestCase):
         rv = self.app.get('/stop_record')
         assert '500' not in rv.data
 
-    def test_stop_record1(self):
+    def test_stop_record(self):
         rv = self.app.get('/stop_record')
         assert '{}' in rv.data
 
@@ -56,6 +56,28 @@ class CollectorWebTestCase(unittest.TestCase):
         assert 'elapsed_time' in js
         t2 = int(js['elapsed_time'])
         assert 3 <= t2 - t1 <= 4    # close enough
+
+    def test_commit(self):
+        rv = self.app.get('/get_commit_time')
+        js = json.loads(rv.data)
+        assert 'commit_time' in js
+        assert js['commit_time'] == 0
+
+        rv = self.app.get('/commit_time/0')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/get_commit_time')
+        js = json.loads(rv.data)
+        assert 'commit_time' in js
+        assert int(js['commit_time']) == 0
+
+        rv = self.app.get('/commit_time/98765')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/get_commit_time')
+        js = json.loads(rv.data)
+        assert 'commit_time' in js
+        assert int(js['commit_time']) == 98765
 
 if __name__ == '__main__':
     unittest.main()

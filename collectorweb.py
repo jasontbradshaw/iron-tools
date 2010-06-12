@@ -35,7 +35,7 @@ def start_record():
     
     # if rtpplay is already started, return
     if rtpdump.isalive():
-        return flask.jsonify(error="rtpplay already running.")
+        return flask.jsonify(warning="rtpplay already running.")
     
     # try to start it, but return an error if it doesn't succeed
     try:

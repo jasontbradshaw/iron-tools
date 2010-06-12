@@ -48,7 +48,7 @@ def start_record():
     
     # try to start it, but return an error if it doesn't succeed
     try:
-        rtpdump.start(RTPDUMP_ADDRESS, RTPDUMP_PORT)
+        rtpdump.start("test.dump", RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:
@@ -70,8 +70,8 @@ def stop_record():
     
     return flask.jsonify()
 
-@app.route("/get_elapsed_time")
-def get_elapsed_time():
+@app.route("/elapsed_time")
+def elapsed_time():
     """
     Returns the elapsed time of the current recording in seconds, or 'None'
     if no recording is currently active.
@@ -86,32 +86,31 @@ def get_elapsed_time():
     
     return flask.jsonify(elapsed_time=elapsed_time)
 
+@app.route("/commit_time")
 @app.route("/commit_time/<int:t>")
-def commit_time(t):
+def commit_time(t=None):
     """
-    Sets the current global video start time that gets transmitted
-    to all clients.
+    Sets or returns the current global video start time that gets
+    transmitted to all clients.
     """
     
-    with glob:
-        glob["commit_time"] = t
+    # return or set depending on whether we got a value for 't'
+    if t is not None:
+        with glob:
+            glob["commit_time"] = t
+        
+        # TODO: write commit time to a file
+        
+    else:
+        # return it if its there, otherwise return 0
+        with glob:
+            if "commit_time" in glob:
+                return flask.jsonify(commit_time=glob["commit_time"])
+            else:
+                return flask.jsonify(commit_time=0)
     
-    # TODO: write commit time to a file
-    
+    # always return success if we made it this far
     return flask.jsonify()
-
-@app.route("/get_commit_time")
-def get_commit_time():
-    """
-    Returns the time committed by the commit function, or 0 if none has
-    been committed yet.
-    """
-    
-    with glob:
-        if "commit_time" in glob:
-            return flask.jsonify(commit_time=glob["commit_time"])
-        else:
-            return flask.jsonify(commit_time=0)
 
 @app.route("/play_preview/<int:start_time>")
 @app.route("/play_preview/<int:start_time>/<int:duration>")

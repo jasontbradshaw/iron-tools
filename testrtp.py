@@ -39,12 +39,12 @@ def vlcdumpplay_test(outfile='vlcdumpplay.dump'):
     print 'press [enter] if this is true'
     raw_input()
     DEVNULL = open(os.devnull, 'w')
-    dump = rtp.RTPDump('localhost', 9876, outfile)
-    play = rtp.RTPPlay('localhost', 9000, outfile)
+    dump = rtp.RTPDump()
+    play = rtp.RTPPlay()
 
-    print "dump pid:", dump.start()
+    print "dump pid:", dump.start(outfile, 'localhost', 9876)
     time.sleep(2)
-    print "play pid:", play.start()
+    print "play pid:", play.start(outfile, 'localhost', 9000)
     print "press [enter] to start 'vlc'"
     raw_input()
     args = [VLCCMD, 'rtp://@:9000']
@@ -74,17 +74,17 @@ def playdumpplay_test(infile='night.tsdump', outfile='playdumpplaytest.tsdump'):
         os.remove(outfile)
 
     DEVNULL = open(os.devnull, 'w')
-    play = rtp.RTPPlay('localhost', 9876, infile)
-    dump = rtp.RTPDump('localhost', 9876, outfile)
-    play2 = rtp.RTPPlay('localhost', 9000, outfile)
+    play = rtp.RTPPlay()
+    dump = rtp.RTPDump()
+    play2 = rtp.RTPPlay()
 
     print 'instantiated objects'
     time.sleep(1)
-    print "play pid:", play.start()
+    print "play pid:", play.start(infile, 'localhost', 9876)
     time.sleep(2)
-    print "dump pid:", dump.start()
+    print "dump pid:", dump.start(outfile, 'localhost', 9876)
     time.sleep(2)
-    print "play2 pid:", play2.start()
+    print "play2 pid:", play2.start(outfile, 'localhost', 9000)
     print "press [enter] to start 'vlc'"
     raw_input()
     args = [VLCCMD, 'rtp://@:9000']

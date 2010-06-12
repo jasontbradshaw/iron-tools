@@ -67,9 +67,11 @@ class RTPPlay(RTPTools):
             if not self.isalive():
                 args = ["./%s" % self.path,
                         "-f", inputfile,
-                        "-b", str(start_time),]
+                        "-b", str(start_time)]
+                
                 if end_time:
                     args.extend(["-e", str(end_time)])
+                
                 args.extend(["%s/%d" % (address, port)])
                 
                 # TODO: figure out how to pipe stderr crap properly w/o
@@ -101,7 +103,7 @@ class RTPDump(RTPTools):
         self.proc = None
         self.outputfile = ''
 
-    def start(self, address, port, dump_format="dump", outputfile=None):
+    def start(self, outputfile, address, port, dump_format="dump"):
         """
         Launches an rtpdump process with the already specified parameters.
         """
@@ -110,15 +112,9 @@ class RTPDump(RTPTools):
             # only launch if no process exists.
             if not self.isalive():
                 
-                # timestamp the file if no file name was specified
-                if not outputfile:
-                    tm = time.strftime("%Y-%m-%d_%H-%M-%S.dump")
-                else:
-                    tm = outputfile
-                
                 args = ["./%s" % self.path,
                         "-F", dump_format,
-                        "-o", tm,
+                        "-o", outputfile,
                         "%s/%d" % (address, port)]
                 
                 # TODO: close devnull?

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import flask
+import rtp
 import os
 from flask import Flask
 from flask import flash
@@ -16,32 +17,42 @@ get_status -> json (i.e. downloading,startime)
 
 app = Flask(__name__)
 glob = util.ThreadedDataStore()
+rtpplay = rtp.RTPPlay('localhost', 9000, "dummy.dump")
 
 @app.route("/")
 def hello():
     return "Receiver Web"
 
-# create play
 @app.route("/play")
 def play():
-    return None
+    if not rtpplay.isalive():
+        return flask.jsonify(error = "rtp is not alive")
+    rtpplay.start()
+    return flask.jsonify()
 
 @app.route("/stop")
 def stop():
-    return None
+    if not rtpplay.isalive():
+        return flask.jsonify(error = "rtp is not alive")
+    rtpplay.stop()
+    return flask.jsonify()
 
 @app.route("/get_file_list")
 def get_file_list():
-    path = "" # TODO: specifiy path name
+    path = "" # TODO: specify path name
     if os.path.exists(path):
         dirList = os.listdir(path)
     else:
         dirList = []
     return flask.jsonify(file_list = dirList)
 
-@app.route("/play_file")
-def play_file(file_name):
-    return None
+@app.route("/load_file/<string:file_name>")
+def load_file(file_name):
+    rtpplay.address = None # TODO: specify ip address
+    rtpplay.inputfile = file_name
+    if not rtpplay.isalive():
+        return flask.jsonify(error = "rtplay is not alive")
+    return flask.jsonify()
 
 @app.route("/get_status")
 def get_status():

@@ -48,7 +48,7 @@ class RTPPlay(RTPTools):
         # init parent for its precious methodly fluids
         RTPTools.__init__(self)
         
-        # path to 'rtpplay' executable
+        # path to 'rtpplay' binary
         self.path = path
         self.proc = None
 
@@ -67,9 +67,9 @@ class RTPPlay(RTPTools):
             if not self.isalive():
                 args = ["./%s" % self.path,
                         "-f", inputfile,
-                        "-b", str(starttime),
+                        "-b", str(start_time),
                         "%s/%d" % (address, port)]
-
+                
                 # TODO: figure out how to pipe stderr crap properly w/o
                 # screwing up our test.
                 # TODO: close devnull?
@@ -90,20 +90,15 @@ class RTPDump(RTPTools):
     #   - kill it.
     #   - what about the existing file? TODO.
 
-    def __init__(self, address='localhost', port=9876, outputfile=None, dumpformat='dump',
-            path='rtpdump'):
-
+    def __init__(self, path='rtpdump'):
         RTPTools.__init__(self)
-
-        self.proc = None
-
-        self.address = address
-        self.port = port
-        self.dumpformat = dumpformat
-        self.outputfile = outputfile
+        
+        # path to 'rtpdump' binary
         self.path = path
-
-    def start(self):
+        
+        self.proc = None
+    
+    def start(self, address, port, dump_format="dump", outputfile=None):
         """
         Launches an rtpdump process with the already specified parameters.
         """
@@ -113,15 +108,15 @@ class RTPDump(RTPTools):
             if not self.isalive():
                 
                 # timestamp the file if no file name was specified
-                if not self.outputfile:
+                if not outputfile:
                     tm = time.strftime("%Y-%m-%d_%H-%M-%S.dump")
                 else:
-                    tm = self.outputfile
+                    tm = outputfile
                 
                 args = ["./%s" % self.path,
-                        "-F", self.dumpformat,
+                        "-F", dump_format,
                         "-o", tm,
-                        "%s/%d" % (self.address, self.port)]
+                        "%s/%d" % (address, port)]
                 
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')

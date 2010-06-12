@@ -111,9 +111,6 @@ def get_commit_time():
             return flask.jsonify(commit_time=glob["commit_time"])
         else:
             return flask.jsonify(commit_time=0)
-<<<<<<< HEAD
-    
-=======
 
 @app.route("/play_preview/<int:start_time>")
 @app.route("/play_preview/<int:start_time>/<int:duration>")

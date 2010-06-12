@@ -13,6 +13,8 @@ glob = util.ThreadedDataStore()
 
 # these do the playing and recording
 rtpdump = rtp.RTPDump()
+
+# config variables
 RTPDUMP_ADDRESS = "localhost"
 RTPDUMP_PORT = 9876
 
@@ -89,6 +91,8 @@ def commit_time(t):
     with glob:
         glob["commit_time"] = t
     
+    # TODO: write commit time to a file
+    
     return flask.jsonify()
 
 @app.route("/get_commit_time")
@@ -103,7 +107,7 @@ def get_commit_time():
             return flask.jsonify(commit_time=glob["commit_time"])
         else:
             return flask.jsonify(commit_time=0)
-
+    
 if __name__ == "__main__":
     app.secret_key = "replace me!"
     app.run(debug = True)

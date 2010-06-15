@@ -37,7 +37,7 @@ class CollectorWebTestCase(unittest.TestCase):
 
     def test_elapsed_time(self):
         rv = self.app.get('/elapsed_time')
-        assert 'null' in rv.data
+        assert '0' in rv.data
         js = json.loads(rv.data)
         assert 'elapsed_time' in js
 

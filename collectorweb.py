@@ -26,7 +26,8 @@ RTPPLAY_PREVIEW_ADDRESS = "localhost"
 RTPPLAY_PREVIEW_PORT = 10000
 
 # location that gets rsync'ed with receivers
-SYNC_DIR = "collector/"
+SYNC_DIR = "collector"
+DUMP_DIR = "dump"
 
 # name of the video file to dump to
 VIDEO_BASENAME = "sermon"
@@ -56,8 +57,9 @@ def start_record():
     
     # try to start it, but return an error if it doesn't succeed
     try:
-        fname = os.path.join(SYNC_DIR, VIDEO_BASENAME)
-        rtpdump.start(fname, RTPDUMP_ADDRESS, RTPDUMP_PORT)
+        # TODO: make file naming more flexible
+        dump_file = os.path.join(SYNC_DIR, DUMP_DIR, VIDEO_BASENAME + ".dump")
+        rtpdump.start(dump_file, RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:
@@ -91,7 +93,7 @@ def elapsed_time():
         if "start_time" in glob and glob["start_time"] is not None:
             elapsed_time = util.time() - glob["start_time"]
         else:
-            return flask.jsonify(elapsed_time=None)
+            elapsed_time = 0
     
     return flask.jsonify(elapsed_time=elapsed_time)
 

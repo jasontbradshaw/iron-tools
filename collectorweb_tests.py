@@ -3,6 +3,10 @@ import unittest
 import json
 import time
 
+# before running create
+# /collector/dump
+# /receiver/dump
+
 class CollectorWebTestCase(unittest.TestCase):
     def setUp(self):
         self.app = collectorweb.app.test_client()

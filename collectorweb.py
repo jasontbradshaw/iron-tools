@@ -81,48 +81,43 @@ def stop_record():
     
     return flask.jsonify()
 
-@app.route("/elapsed_time")
-def elapsed_time():
+@app.route("/get_record_status")
+def get_record_status():
     """
-    Returns the elapsed time of the current recording in seconds, or 'None'
-    if no recording is currently active.
+    Returns the status of the recording, including elapsed time, whether
+    a recording is happending, and what the commit time is set to.
     """
     
+    # retrieve commit time, elapsed time, and recording status
     with glob:
-        # only return a time if one has been set or reset to 'None'
+        commit_time = 0
+        if "commit_time" in glob and glob["commit_time"] is not None:
+            commit_time = glob["commit_time"]
+        
+        elapsed_time = 0
         if "start_time" in glob and glob["start_time"] is not None:
             elapsed_time = util.time() - glob["start_time"]
-        else:
-            elapsed_time = 0
     
-    return flask.jsonify(elapsed_time=elapsed_time)
-
-@app.route("/commit_time")
+    is_recording = rtpdump.isalive()
+    
+    return flask.jsonify(seconds_elapsed=elapsed_time,
+                         committed_time=commit_time,
+                         is_recording=is_recording)
+    
 @app.route("/commit_time/<int:t>")
-def commit_time(t=None):
+def commit_time(t):
     """
-    Sets or returns the current global video start time that gets
-    transmitted to all clients.
+    Sets the current global video start time that gets transmitted to
+    all clients.
     """
     
-    # return or set depending on whether we got a value for 't'
-    if t is not None:
-        with glob:
-            glob["commit_time"] = t
-        
-        # write the commit time to file
-        with open(os.path.join(SYNC_DIR, "commit_time"), 'w') as f:
-            f.write(str(t))
-    else:
-        # return it if its there, otherwise return 0
-        with glob:
-            if "commit_time" in glob:
-                return flask.jsonify(commit_time=glob["commit_time"])
-            else:
-                return flask.jsonify(commit_time=0)
+    # set commit time
+    with glob:
+        glob["commit_time"] = t
     
-    # always return success if we made it this far
-    return flask.jsonify()
+    # write the commit time to file
+    with open(os.path.join(SYNC_DIR, "commit_time"), 'w') as f:
+        f.write(str(t))
 
 @app.route("/play_preview/<int:start_time>")
 @app.route("/play_preview/<int:start_time>/<int:duration>")
@@ -139,7 +134,7 @@ def play_preview(start_time, duration=30):
     # attempt to play the given file
     rtpplay.start(rtpdump.outputfile, RTPPLAY_PREVIEW_ADDRESS,
             RTPPLAY_PREVIEW_PORT, start_time=start_time,
-            end_time=start_time+duration)
+            end_time=start_time + duration)
     
     if not rtpplay.isalive():
         return flask.jsonify(error="rtpplay is not alive")

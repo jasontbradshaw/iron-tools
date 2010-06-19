@@ -9,7 +9,7 @@ class RTPTools:
         self.lock = threading.Lock()
 
     def isalive(self):
-        if not self.proc:
+        if self.proc is None:
             return False
         return self.proc.poll() is None
 
@@ -51,11 +51,15 @@ class RTPPlay(RTPTools):
         # path to 'rtpplay' binary
         self.path = path
         self.proc = None
-
-    def start(self, inputfile, address, port, start_time=0, end_time=None):
+    
+    def start(self, inputfile, address, port, start_time=None, end_time=None,
+              wait_start=False):
         """
         Start the rtpplay process with a file to play, an address, then port
-        to play to, and optionally a time to start playing the stream from.
+        to play to, an optional time to start playing the stream from, and
+        whether to pause execution and wait after seeking to the start time.
+        If wait_start is True, a call to begin_playback will be neccessary
+        to actually start the playback.
         """
         
         with self.lock:
@@ -66,21 +70,36 @@ class RTPPlay(RTPTools):
             # only launch if process isn't already running or isn't alive
             if not self.isalive():
                 args = ["./%s" % self.path,
-                        "-f", inputfile,
-                        "-b", str(start_time)]
+                        "-f", inputfile]
                 
-                if end_time:
+                if start_time is not None:
+                    args.extend(["-b", str(start_time)])
+                
+                if end_time is not None:
                     args.extend(["-e", str(end_time)])
+                
+                if wait_start:
+                    args.append("-w")
                 
                 args.extend(["%s/%d" % (address, port)])
                 
-                # TODO: figure out how to pipe stderr crap properly w/o
-                # screwing up our test.
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')
-                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL,
+                                     stdin=sp.PIPE)
         
         return self.pid()
+    
+    def begin_playback(self):
+        """
+        If rtpplay was started with waiting turned on, this sends the command
+        to begin actual playback.  If waiting wasn't enabled, this
+        command has no effect, ill or otherwise.
+        """
+        
+        # send a newline to tell the process to start as soon as it can
+        if self.isalive():
+            self.proc.stdin.write("\n")
 
 class RTPDump(RTPTools):
     """

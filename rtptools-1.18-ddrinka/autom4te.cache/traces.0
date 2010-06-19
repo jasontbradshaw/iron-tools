@@ -487,7 +487,7 @@ m4trace:configure.in:53: -1- m4_pattern_allow([^_LARGE_FILES$])
 m4trace:configure.in:53: -1- AH_OUTPUT([_LARGE_FILES], [/* Define for large files, on AIX-style hosts. */
 @%:@undef _LARGE_FILES])
 m4trace:configure.in:57: -1- _m4_warn([obsolete], [The macro `AC_TYPE_SIGNAL' is obsolete.
-You should run autoupdate.], [../../lib/autoconf/types.m4:754: AC_TYPE_SIGNAL is expanded from...
+You should run autoupdate.], [../../lib/autoconf/types.m4:738: AC_TYPE_SIGNAL is expanded from...
 configure.in:57: the top level])
 m4trace:configure.in:57: -1- AC_DEFINE_TRACE_LITERAL([RETSIGTYPE])
 m4trace:configure.in:57: -1- m4_pattern_allow([^RETSIGTYPE$])

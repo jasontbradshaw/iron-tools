@@ -57,7 +57,14 @@ def get_file_list():
     # sort directories before returning
     dirlist.sort()
     
-    return flask.jsonify(file_list=dirlist)
+    results = []
+    for f in dirlist:
+        size = os.path.getsize(os.path.join(DUMP_DIR, f))
+        
+        # TODO: why would we need 'start_time_received' boolean?
+        results.append((f, True, size))
+    
+    return flask.jsonify(file_list=results)
 
 @app.route("/commit_time")
 def commit_time():
@@ -78,14 +85,14 @@ def commit_time():
     
     return flask.jsonify(commit_time=commit_time)
 
-@app.route("/play_file/<file_name>")
-def play_file(file_name):
+@app.route("/arm/<file_name>")
+def arm(file_name):
     """
     Attempts to play the file argument.  Returns success if it could find
     the file and was not already playing, otherwise an error.
     """
     
-    # don't play again if already running
+    # don't arm again if already running
     if rtpplay.isalive():
         return flask.jsonify(warning="rtpplay already running.")
     
@@ -107,10 +114,22 @@ def play_file(file_name):
         pass
     
     # attempt to play the given file
-    rtpplay.start(path, RTPPLAY_ADDRESS, RTPPLAY_PORT, start_time=commit_time)
+    rtpplay.start(path, RTPPLAY_ADDRESS, RTPPLAY_PORT, start_time=commit_time,
+                  wait_start=True)
     
     if not rtpplay.isalive():
         return flask.jsonify(error="rtpplay is not alive")
+    
+    return flask.jsonify()
+
+@app.route("/play")
+def play():
+    """
+    Starts the actual playback queued up by the arm process.
+    """
+    
+    # send the signal to start playback
+    rtpplay.begin_playback()
     
     return flask.jsonify()
 

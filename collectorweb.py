@@ -75,11 +75,14 @@ def stop_record():
     
     rtpdump.stop()
     
+    # save the final status for return after varaible reset
+    final_status = get_record_status()
+    
     # prevents counting elapsed time while stopped
     with glob:
         glob["start_time"] = None
     
-    return flask.jsonify()
+    return final_status
 
 @app.route("/get_record_status")
 def get_record_status():

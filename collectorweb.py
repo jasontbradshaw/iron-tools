@@ -156,4 +156,4 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=81, debug=True)

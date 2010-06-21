@@ -157,4 +157,4 @@ def get_status():
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=82, debug=True)

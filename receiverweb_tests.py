@@ -46,16 +46,30 @@ class ReceiverWebTestCase(unittest.TestCase):
             assert 'commit_time' in js
 
     # asserts that fake_test.dump did not exist and proper error was returned
-    def test_play_file(self):
-        rv = self.app.get('/play_file/fake_test.dump')
+    def test_arm(self):
+        rv = self.app.get('/arm/fake_test.dump')
         js = json.loads(rv.data)
+        assert js['error'] == "Could not find file 'fake_test.dump'."
 
         rv2 = self.app.get('/get_file_list')
         js2 = json.loads(rv2.data)
-        if js2['file_list'] == []:
-            assert js['error'] == "Could not find file 'fake_test.dump'."
-        else:
-            assert 'commit_time' in js
+        assert js2['file_list'] == []
+        
+        rv3 = self.app.get('/commit_time')
+        js3 = json.loads(rv3.data)
+        assert int(js3['commit_time']) == 0
+
+    # asserts that play does not break when there is nothing to play
+    def test_play(self):
+        rv = self.app.get('/play')
+        js = json.loads(rv.data)
+        assert js['warning'] == 'rtpplay is not alive, no signal sent'
+
+    # asserts that get_status returns 'false' when nothing is playing
+    def test_get_status(self):
+        rv = self.app.get('/get_status')
+        js = json.loads(rv.data)
+        print js['playing'] == 'false'
 
 if __name__ == '__main__':
     unittest.main()

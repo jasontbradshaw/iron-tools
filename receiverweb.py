@@ -20,12 +20,21 @@ app = Flask(__name__)
 rtpplay = rtp.RTPPlay()
 
 # config variables
-RTPPLAY_ADDRESS = "localhost"
-RTPPLAY_PORT = 9002
+RTPPLAY_ADDRESS = "10.98.0.81"
+RTPPLAY_PORT = 5008
 
+# directories rsync'ed from server
 SYNC_DIR = "receiver/"
 DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 COMMIT_FILE = os.path.join(SYNC_DIR, "commit_time")
+
+# create rsync directories if they don't exist
+try:
+    if not os.path.exists(DUMP_DIR):
+        os.makedirs(DUMP_DIR)
+except OSError:
+    # failing means the directories already exist
+    pass
 
 @app.route("/")
 def hello():

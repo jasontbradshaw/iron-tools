@@ -18,16 +18,25 @@ rtpdump = rtp.RTPDump()
 rtpplay = rtp.RTPPlay()
 
 # config variables
-RTPDUMP_ADDRESS = "localhost"
-RTPDUMP_PORT = 9876
+RTPDUMP_ADDRESS = "0.0.0.0"
+RTPDUMP_PORT = 5004
 
 # where dump preview gets sent
-RTPPLAY_PREVIEW_ADDRESS = "localhost"
-RTPPLAY_PREVIEW_PORT = 10000
+RTPPLAY_PREVIEW_ADDRESS = "10.98.0.80"
+RTPPLAY_PREVIEW_PORT = 5006
 
 # location that gets rsync'ed with receivers
 SYNC_DIR = "collector"
-DUMP_DIR = "dump"
+DUMP_DIR = os.path.join(SYNC_DIR, "dump")
+COMMIT_FILE = os.path.join(SYNC_DIR, "commit_time")
+
+# create rsync directories if they don't exist
+try:
+    if not os.path.exists(DUMP_DIR):
+        os.makedirs(DUMP_DIR)
+except OSError:
+    # failing means the directories already exist
+    pass
 
 # name of the video file to dump to
 VIDEO_BASENAME = "sermon"
@@ -58,7 +67,7 @@ def start_record():
     # try to start it, but return an error if it doesn't succeed
     try:
         # TODO: make file naming more flexible
-        dump_file = os.path.join(SYNC_DIR, DUMP_DIR, VIDEO_BASENAME + ".dump")
+        dump_file = os.path.join(DUMP_DIR, VIDEO_BASENAME + ".dump")
         rtpdump.start(dump_file, RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
@@ -119,7 +128,7 @@ def commit_time(t):
         glob["commit_time"] = t
     
     # write the commit time to file
-    with open(os.path.join(SYNC_DIR, "commit_time"), 'w') as f:
+    with open(COMMIT_FILE, 'w') as f:
         f.write(str(t))
 
 @app.route("/play_preview/<int:start_time>")

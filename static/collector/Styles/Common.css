@@ -1,0 +1,41 @@
+﻿body
+{
+    font-family:Verdana;
+    font-size:10pt;
+}
+
+.button
+{
+	height:40px;
+	width:40px;
+}
+
+.panel
+{
+	border-style:outset;
+	float:left;
+	clear:left;	
+	margin:20px;
+	padding: 2px;
+	overflow:visible;
+}
+
+.panelTitle
+{
+	float:left;
+	clear:left;
+	margin:0px 5px;
+	font-size:12pt;
+	font-weight:bold;
+	background-color:white;
+	position:relative;
+	top:-12px;
+	/*margin:0px 5px -10px 5px;*/
+	padding:0px 2px;
+}
+
+.panelBody
+{
+	float:left;
+	clear:left;
+}

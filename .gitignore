@@ -1,7 +1,5 @@
 *.pyc
 *~
 clean.sh
-collector/
 rtpdump
 rtpplay
-rtptools-1.18/

@@ -83,7 +83,7 @@ def stop_record():
     """
     
     rtpdump.stop()
-    
+
     # save the final status for return after varaible reset
     final_status = get_record_status()
     
@@ -123,6 +123,8 @@ def commit_time(t):
     all clients.
     """
     
+		#TODO check for non-negative numbers, throw error if not
+
     # set commit time
     with glob:
         glob["commit_time"] = t

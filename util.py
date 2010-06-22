@@ -7,6 +7,17 @@ def time():
     """
     return int(t.time())
 
+def generate_file_name(basename, extension="dump"):
+    """
+    Generates a timestamped file name based on the base name and extension
+    given.
+    """
+    
+    timeformat = "%Y-%m-%d_%H:%M:%S"
+    
+    # create the file name in format: <timestamp><basename>.<extension>
+    return t.strftime(timeformat) + basename + "." + extension
+
 class UnlockedAccessError(Exception):
     """
     Thrown when someone tries to acces the dictionary while it

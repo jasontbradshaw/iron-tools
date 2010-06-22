@@ -39,7 +39,7 @@ except OSError:
     pass
 
 # name of the video file to dump to
-VIDEO_BASENAME = "sermon"
+VIDEO_BASENAME = "sermon_"
 
 """
 Conventions:
@@ -67,7 +67,8 @@ def start_record():
     # try to start it, but return an error if it doesn't succeed
     try:
         # TODO: make file naming more flexible
-        dump_file = os.path.join(DUMP_DIR, VIDEO_BASENAME + ".dump")
+        dump_file = os.path.join(DUMP_DIR,
+                                 util.generate_file_name(VIDEO_BASENAME))
         rtpdump.start(dump_file, RTPDUMP_ADDRESS, RTPDUMP_PORT)
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
@@ -155,4 +156,4 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(debug = True, port=5000)
+    app.run(debug=True, port=5000)

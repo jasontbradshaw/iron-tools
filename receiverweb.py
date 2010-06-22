@@ -137,6 +137,10 @@ def play():
     Starts the actual playback queued up by the arm process.
     """
     
+    # warn if rtpplay is not yet running
+    if not rtpplay.isalive():
+        return flask.jsonify(warning="rtpplay is not alive, no signal sent")
+    
     # send the signal to start playback
     rtpplay.begin_playback()
     

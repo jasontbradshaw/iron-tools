@@ -36,6 +36,27 @@ except OSError:
     # failing means the directories already exist
     pass
 
+def load_commit_time(filename, extension="time"):
+    """
+    Loads a commit time from a file and return it as an integer.
+    
+    'filename' is the name of a video file founnd in the dump directory.
+    """
+    
+    dump_file = os.path.join(SYNC_DIR, filename + "." + extension)
+    
+    # return None if there was no dump file for the given filename
+    if not os.path.exists(dump_file):
+        return None
+    
+    with open(dump_file, 'r') as f:
+        num = f.read()
+    
+    try:
+        return int(num)
+    except ValueError:
+        return 0
+    
 @app.route("/")
 def hello():
     return "Receiver Web"

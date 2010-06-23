@@ -51,6 +51,8 @@ def load_commit_time(filename, extension="time"):
         pass
     except ValueError:
         pass
+    except IOError:
+        pass
     
     # return the default value if we failed to get the time for any reason
     return 0

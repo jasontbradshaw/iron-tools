@@ -28,24 +28,11 @@ class ReceiverWebTestCase(unittest.TestCase):
         assert 'file_list' in js
         assert js['file_list'] == []
 
-    #def test_commit_time_1(self):
-        #rv = self.app.get('/commit_time')
-        #js = json.loads(rv.data)
-        #assert 'commit_time' in js
+    def test_commit_time_1(self):
+        result = receiverweb.load_commit_time('fake_test')
+        assert result == 0
 
-    # if the directory is empty assert commit_time = 0
-    #def test_commit_time_2(self):
-        #rv = self.app.get('/commit_time')
-        #js = json.loads(rv.data)
-
-        #rv2 = self.app.get('/get_file_list')
-        #js2 = json.loads(rv2.data)
-        #if js2['file_list'] == []:
-            #assert int(js['commit_time']) == 0
-        #else:
-            #assert 'commit_time' in js
-
-    # asserts that fake_test.dump did not exist and proper error was returned
+     # asserts that fake_test.dump did not exist and proper error was returned
     def test_arm(self):
         rv = self.app.get('/arm/fake_test.dump')
         js = json.loads(rv.data)
@@ -54,22 +41,18 @@ class ReceiverWebTestCase(unittest.TestCase):
         rv2 = self.app.get('/get_file_list')
         js2 = json.loads(rv2.data)
         assert js2['file_list'] == []
-        
-        #rv3 = self.app.get('/commit_time')
-        #js3 = json.loads(rv3.data)
-        #assert int(js3['commit_time']) == 0
-
+ 
     # asserts that play does not break when there is nothing to play
     def test_play(self):
         rv = self.app.get('/play')
         js = json.loads(rv.data)
         assert js['warning'] == 'rtpplay is not alive, no signal sent.'
 
-    # asserts that get_status returns 'false' when nothing is playing
+    # asserts that get_status returns False when nothing is playing
     def test_get_status(self):
         rv = self.app.get('/get_status')
         js = json.loads(rv.data)
-        #print js['playing'] == 'false'
+        assert js['playing'] == False
 
 if __name__ == '__main__':
     unittest.main()

@@ -102,7 +102,30 @@ class CollectorWebTestCase(unittest.TestCase):
         assert 'error' in js
         assert js['error'] == "no recording started, unable to preview."
 
-        
+        self.app.get('/start_record')
+
+        rv = self.app.get('/play_preview/-100')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/play_preview/0')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/play_preview/5')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/play_preview/13371337')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/play_preview/10/0')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/play_preview/0/0')
+        assert '{}' in rv.data
+
+        rv = self.app.get('/play_preview/10/-10')
+        assert '{}' in rv.data
+
+
 
 
 

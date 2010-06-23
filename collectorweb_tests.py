@@ -8,69 +8,78 @@ import time
 # /receiver/dump
 
 class CollectorWebTestCase(unittest.TestCase):
+
+		
+
     def setUp(self):
         self.app = collectorweb.app.test_client()
 
     def tearDown(self):
         pass
 
-    def test_test(self):
+    #asserts starting conditions are correct
+    def test_01_test(self):
         rv = self.app.get('/')
         assert 'Collector Web' in rv.data
         rv = self.app.get('/stop_record')
-        assert '500' not in rv.data
+	js = json.loads(rv.data)
+        assert js['is_recording'] == False
+        assert js['seconds_elapsed'] == 0
+        assert js['committed_time'] == 0
 
-    def test_stop_record(self):
-        rv = self.app.get('/stop_record')
-        assert '{}' in rv.data
+    #assert start record prevents double starting
+    def test_02_record(self):
+	
 
-    def test_record(self):
-        rv = self.app.get('/stop_record')
+        rv = self.app.get('/start_record')
         assert '{}' in rv.data
 
         rv = self.app.get('/start_record')
-        assert '{}' in rv.data
-
-        rv = self.app.get('/start_record')
-        assert 'warning' in rv.data
         js = json.loads(rv.data)
-        assert 'warning' in js
+        assert js['warning'] == 'rtpdump already running.'
 
-        rv = self.app.get('/stop_record')
-        assert '{}' in rv.data
+        self.app.get('/stop_record')
 
-    def test_elapsed_time(self):
-        rv = self.app.get('/elapsed_time')
-        assert '0' in rv.data
+    #asserts the time is being tracked properly
+    def test_03_elapsed_time(self):       
+
+        rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert 'elapsed_time' in js
+        assert js['elapsed_time'] == '0'
 
         rv = self.app.get('/start_record')
         assert '{}' in rv.data
 
-        rv = self.app.get('/elapsed_time')
+        rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'elapsed_time' in js
         t1 = int(js['elapsed_time'])
 
         time.sleep(3)
 
-        rv = self.app.get('/elapsed_time')
+        rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'elapsed_time' in js
         t2 = int(js['elapsed_time'])
         assert 3 <= t2 - t1 <= 4    # close enough
+        
+        self.app.get('/stop_record')
+    #asserts that commit works correctly for nzp values
+    def test_04_commit(self):
 
-    def test_commit(self):
-        rv = self.app.get('/commit_time')
+        rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'commit_time' in js
         assert js['commit_time'] == 0
 
+        rv = self.app.get('/commit_time/-5')
+        js = json.loads(rv.data)
+        assert 'error' in js
+
         rv = self.app.get('/commit_time/0')
         assert '{}' in rv.data
 
-        rv = self.app.get('/commit_time')
+        rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'commit_time' in js
         assert int(js['commit_time']) == 0
@@ -78,10 +87,24 @@ class CollectorWebTestCase(unittest.TestCase):
         rv = self.app.get('/commit_time/98765')
         assert '{}' in rv.data
 
-        rv = self.app.get('/commit_time')
+        rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'commit_time' in js
         assert int(js['commit_time']) == 98765
+
+        self.app.get('/stop_record')
+
+    #assert play preview funtions properly with nzp values
+    def test_05_play_preview(self):
+        
+        rv = self.app.get('/play_preview/30')
+        js = json.loads(rv.data)
+        assert 'error' in js
+        assert js['error'] == "no recording started, unable to preview."
+
+        
+
+
 
 if __name__ == '__main__':
     unittest.main()

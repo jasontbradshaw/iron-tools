@@ -128,7 +128,7 @@ def commit_time(t):
     all clients.
     """
     
-		#TODO check for non-negative numbers, throw error if not
+    #TODO check for non-negative numbers, throw error if not
 
     # set commit time
     with glob:

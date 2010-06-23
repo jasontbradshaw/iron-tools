@@ -16,19 +16,17 @@ get_status -> json (i.e. downloading,startime)
 """
 
 app = Flask(__name__)
-#glob = util.ThreadedDataStore()
 rtpplay = rtp.RTPPlay()
 
 # config variables
 RTPPLAY_ADDRESS = "10.98.0.81"
 RTPPLAY_PORT = 5008
 
-# directories rsync'ed from server
-SYNC_DIR = "receiver/"
+# directories synced from server
+SYNC_DIR = "sync"
 DUMP_DIR = os.path.join(SYNC_DIR, "dump")
-COMMIT_FILE = os.path.join(SYNC_DIR, "commit_time")
 
-# create rsync directories if they don't exist
+# create sync directories if they don't exist
 try:
     if not os.path.exists(DUMP_DIR):
         os.makedirs(DUMP_DIR)
@@ -45,17 +43,17 @@ def load_commit_time(filename, extension="time"):
     
     dump_file = os.path.join(SYNC_DIR, filename + "." + extension)
     
-    # return None if there was no dump file for the given filename
-    if not os.path.exists(dump_file):
-        return None
-    
-    with open(dump_file, 'r') as f:
-        num = f.read()
-    
+    # read file time, or 0 if we couldn't
     try:
-        return int(num)
+        with open(dump_file, 'r') as f:
+            num = int(f.read())
+    except OSError:
+        pass
     except ValueError:
-        return 0
+        pass
+    
+    # return the default value if we failed to get the time for any reason
+    return 0
     
 @app.route("/")
 def hello():
@@ -74,7 +72,7 @@ def stop():
     return flask.jsonify()
 
 @app.route("/get_file_list")
-def get_file_list():
+def get_file_list(extension="time"):
     """
     Returns a list of files found in the dump directory.
     """
@@ -89,31 +87,17 @@ def get_file_list():
     
     results = []
     for f in dirlist:
+        # get the size of the current file in bytes
         size = os.path.getsize(os.path.join(DUMP_DIR, f))
         
-        # TODO: why would we need 'start_time_received' boolean?
-        results.append((f, True, size))
+        # determine if we received a commit time for the file
+        commit_file = os.path.join(SYNC_DIR, f + "." + extension)
+        commit_time_found = os.path.exists(commit_file)
+        
+        # add them all to the list as a tuple of (filename, found time?, size)
+        results.append((f, commit_time_found, size))
     
     return flask.jsonify(file_list=results)
-
-@app.route("/commit_time")
-def commit_time():
-    """
-    Returns the current commit time found in the sync directory.
-    """
-    
-    # attempt to read commit time from file
-    commit_time = 0
-    try:
-        with open(COMMIT_FILE, 'r') as f:
-            commit_time = int(f.read())
-    except ValueError:
-        return flask.jsonify(error="Non-integer commit time.")
-    except IOError:
-        # no file means start from 0
-        pass
-    
-    return flask.jsonify(commit_time=commit_time)
 
 @app.route("/arm/<file_name>")
 def arm(file_name):
@@ -124,7 +108,7 @@ def arm(file_name):
     
     # don't arm again if already running
     if rtpplay.isalive():
-        return flask.jsonify(warning="rtpplay already running.")
+        return flask.jsonify(warning="rtpplay is already running.")
     
     path = os.path.join(DUMP_DIR, file_name)
     
@@ -132,23 +116,15 @@ def arm(file_name):
     if not os.path.isfile(path):
         return flask.jsonify(error="Could not find file '%s'." % file_name)
     
-    # try to get the commit time from file
-    commit_time = 0
-    try:
-        with open(COMMIT_FILE, 'r') as f:
-            commit_time = int(f.read())
-    except ValueError:
-        return flask.jsonify(error="Non-integer commit time.")
-    except IOError:
-        # if there's no file, start from 0
-        pass
+    # get the commit time from file
+    commit_time = load_commit_time(file_name)
     
     # attempt to play the given file
     rtpplay.start(path, RTPPLAY_ADDRESS, RTPPLAY_PORT, start_time=commit_time,
                   wait_start=True)
     
     if not rtpplay.isalive():
-        return flask.jsonify(error="rtpplay is not alive")
+        return flask.jsonify(error="rtpplay did not start correctly.")
     
     return flask.jsonify()
 
@@ -160,7 +136,7 @@ def play():
     
     # warn if rtpplay is not yet running
     if not rtpplay.isalive():
-        return flask.jsonify(warning="rtpplay is not alive, no signal sent")
+        return flask.jsonify(warning="rtpplay is not alive, no signal sent.")
     
     # send the signal to start playback
     rtpplay.begin_playback()
@@ -178,4 +154,4 @@ def get_status():
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"
-    app.run(host="0.0.0.0", port=82, debug=True)
+    app.run(host="127.0.0.1", port=5082, debug=True)

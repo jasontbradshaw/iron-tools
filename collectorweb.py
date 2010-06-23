@@ -26,8 +26,8 @@ RTPDUMP_PORT = 5004
 RTPPLAY_PREVIEW_ADDRESS = "10.98.0.81"
 RTPPLAY_PREVIEW_PORT = 5008
 
-# location that gets rsync'ed with receivers
-SYNC_DIR = "collector"
+# location that gets synced with receivers
+SYNC_DIR = "sync"
 DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 
 # create sync directories if they don't exist

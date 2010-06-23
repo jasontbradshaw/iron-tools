@@ -22,8 +22,8 @@ RTPDUMP_ADDRESS = "0.0.0.0"
 RTPDUMP_PORT = 5004
 
 # where dump preview gets sent
-RTPPLAY_PREVIEW_ADDRESS = "10.98.0.80"
-RTPPLAY_PREVIEW_PORT = 5006
+RTPPLAY_PREVIEW_ADDRESS = "10.98.0.81"
+RTPPLAY_PREVIEW_PORT = 5008
 
 # location that gets rsync'ed with receivers
 SYNC_DIR = "collector"
@@ -39,7 +39,7 @@ except OSError:
     pass
 
 # name of the video file to dump to
-VIDEO_BASENAME = "sermon"
+VIDEO_BASENAME = "sermon_"
 
 """
 Conventions:
@@ -67,8 +67,13 @@ def start_record():
     # try to start it, but return an error if it doesn't succeed
     try:
         # TODO: make file naming more flexible
-        dump_file = os.path.join(DUMP_DIR, VIDEO_BASENAME + ".dump")
+        dump_file = os.path.join(DUMP_DIR,
+                                 util.generate_file_name(VIDEO_BASENAME))
         rtpdump.start(dump_file, RTPDUMP_ADDRESS, RTPDUMP_PORT)
+        
+        with glob:
+            glob["last_dump_file"] = dump_file
+            
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:
@@ -140,13 +145,22 @@ def play_preview(start_time, duration=30):
     RTPPlay duration seconds of the current dump starting at time start_time.
     """
 
+    # TODO: kill preview processes before starting a new one
+    
+    # get last started record
+    with glob:
+        if "dump_file" not in glob:
+            return flask.jsonify(error="no recording started, unable to preview.")
+        
+        dump_file = glob["last_dump_file"]
+    
     # ensure the file exists
-    if not os.path.exists(rtpdump.outputfile):
+    if not os.path.exists(dump_file):
         return flask.jsonify(error="Could not find file '%s'." %
-                rtpdump.outputfile)
+                dump_file)
     
     # attempt to play the given file
-    rtpplay.start(rtpdump.outputfile, RTPPLAY_PREVIEW_ADDRESS,
+    rtpplay.start(dump_file, RTPPLAY_PREVIEW_ADDRESS,
             RTPPLAY_PREVIEW_PORT, start_time=start_time,
             end_time=start_time + duration)
     
@@ -157,4 +171,4 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(debug = True, port=5000)
+    app.run(host="0.0.0.0", port=81, debug=True)

@@ -1,0 +1,47 @@
+.buttonPanel
+{
+    float:left;
+    clear:left;
+}
+
+.committedTime
+{
+	/*font-family:Verdana;*/
+	font-style:italic;
+}
+
+.uncommittedTime
+{
+	/*font-family:Verdana;*/
+	font-style:normal;
+}
+
+.elapsedTime
+{
+	background-color:Black;
+	color:red;
+	text-align:right;
+	border-style:inset;
+	border-width: 1px;
+	font-weight:bold;
+	font-family:Courier New;
+	float:left;
+}
+
+.elapsedTimeRecording
+{
+	color:Red;
+}
+
+.status
+{
+	/*font-family:Verdana;*/
+	text-align:center;
+	font-weight:bold;
+}
+
+.statusError
+{
+	background-color:Red;
+}
+

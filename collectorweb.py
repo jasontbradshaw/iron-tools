@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import time
 
 import flask
 from flask import Flask
@@ -28,9 +29,8 @@ RTPPLAY_PREVIEW_PORT = 5008
 # location that gets rsync'ed with receivers
 SYNC_DIR = "collector"
 DUMP_DIR = os.path.join(SYNC_DIR, "dump")
-COMMIT_FILE = os.path.join(SYNC_DIR, "commit_time")
 
-# create rsync directories if they don't exist
+# create sync directories if they don't exist
 try:
     if not os.path.exists(DUMP_DIR):
         os.makedirs(DUMP_DIR)
@@ -38,13 +38,24 @@ except OSError:
     # failing means the directories already exist
     pass
 
-# name of the video file to dump to
-VIDEO_BASENAME = "sermon_"
+# text to include after the time in dumped files
+VIDEO_BASENAME = "_sermon"
 
 """
 Conventions:
   - Returning the empty JSON object {} signifies success.
 """
+
+def write_commit_file(filename, t, extension="time"):
+    """
+    Writes the given time to the given dump file name and saves it to the
+    sync directory.
+    """
+    
+    # write the time to its file
+    commit_file = os.path.join(SYNC_DIR, filename + "." + extension)
+    with open(commit_file, 'w') as f:
+        f.write(str(t))
 
 @app.route("/")
 def hello():
@@ -56,9 +67,10 @@ def start_record():
     Starts the recording process.
     """
     
-    # save the time we started recording
+    # save the time we started recording, clear previous commit time
     with glob:
         glob["start_time"] = util.time()
+        glob["commit_time"] = None
     
     # if rtpdump is already started, return
     if rtpdump.isalive():
@@ -66,13 +78,12 @@ def start_record():
     
     # try to start it, but return an error if it doesn't succeed
     try:
-        # TODO: make file naming more flexible
         dump_file = os.path.join(DUMP_DIR,
                                  util.generate_file_name(VIDEO_BASENAME))
         rtpdump.start(dump_file, RTPDUMP_ADDRESS, RTPDUMP_PORT)
         
         with glob:
-            glob["last_dump_file"] = dump_file
+            glob["dump_file"] = dump_file
             
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
@@ -130,12 +141,23 @@ def commit_time(t):
     
     # set commit time
     with glob:
+        # make sure 
+        if "dump_file" not in glob:
+            return flask.jsonify(
+                error="no currently recording file, no commit time set")
+        
+        # set current commit time
         glob["commit_time"] = t
+        
+        # get file name to write this commit time to
+        dump_file = glob["dump_file"]
     
-    # write the commit time to file
-    with open(COMMIT_FILE, 'w') as f:
-        f.write(str(t))
-
+    # write the commit file to disk
+    base_filename = os.path.basename(dump_file)
+    write_commit_file(base_filename, t)
+    
+    return flask.jsonify()
+        
 @app.route("/play_preview/<int:start_time>")
 @app.route("/play_preview/<int:start_time>/<int:duration>")
 def play_preview(start_time, duration=30):
@@ -143,19 +165,24 @@ def play_preview(start_time, duration=30):
     RTPPlay duration seconds of the current dump starting at time start_time.
     """
 
-    # TODO: kill preview processes before starting a new one
-    
     # get last started record
     with glob:
         if "dump_file" not in glob:
             return flask.jsonify(error="no recording started, unable to preview.")
         
-        dump_file = glob["last_dump_file"]
+        dump_file = glob["dump_file"]
     
     # ensure the file exists
     if not os.path.exists(dump_file):
         return flask.jsonify(error="Could not find file '%s'." %
                 dump_file)
+    
+    # stop the current preview
+    rtpplay.stop()
+    
+    # wait until it dies before starting another
+    while rtpplay.isalive():
+        time.sleep(0.001)
     
     # attempt to play the given file
     rtpplay.start(dump_file, RTPPLAY_PREVIEW_ADDRESS,
@@ -169,4 +196,4 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(host="0.0.0.0", port=81, debug=True)
+    app.run(host="127.0.0.1", port=5081, debug=True)

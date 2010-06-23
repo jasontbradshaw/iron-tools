@@ -139,14 +139,12 @@ def commit_time(t):
     all clients.
     """
     
-    #TODO check for non-negative numbers, throw error if not
-
     # set commit time
     with glob:
         # make sure 
         if "dump_file" not in glob:
             return flask.jsonify(
-                error="no currently recording file, no commit time set")
+                error="no currently recording file, no commit time set.")
         
         # set current commit time
         glob["commit_time"] = t
@@ -170,7 +168,8 @@ def play_preview(start_time, duration=30):
     # get last started record
     with glob:
         if "dump_file" not in glob:
-            return flask.jsonify(error="no recording started, unable to preview.")
+            return flask.jsonify(
+                error="no recording started, unable to preview.")
         
         dump_file = glob["dump_file"]
     

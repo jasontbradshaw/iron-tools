@@ -20,36 +20,6 @@ function createResult(seconds_elapsed, is_recording, committed_time)
     return obj;
 }
 
-function displayStatusMessage(message, isError)
-{
-    var statusPanel = $("#statusPanel");
-    statusPanel.text(message);
-    var body = $("body");
-    var windowWidth = body.innerWidth();
-    var statusWidth = statusPanel.outerWidth();
-
-    statusPanel.css("position", "absolute");
-    statusPanel.css("top", body.scrollTop());
-    statusPanel.css("left", (windowWidth - statusWidth) / 2);
-
-    if (isError)
-    {
-        statusPanel.addClass("statusError");
-    }
-    else
-    {
-        statusPanel.removeClass("statusError");
-    }
-
-    statusPanel.fadeIn(2000, hideStatusMessage);
-    //window.setTimeout(function () { alert(message); }, 500);
-}
-
-function hideStatusMessage()
-{
-    $("#statusPanel").fadeOut(2000, function () { $("#statusPanel").text(""); });
-}
-
 function startRecording(recordButton)
 {
     if (!recordButton.disabled)
@@ -60,7 +30,7 @@ function startRecording(recordButton)
 
 function startRecordingOnComplete(status)
 {
-    var result = createResult(0, isNullOrEmpty(status.error), getCommittedTime());
+    var result = createResult(0, String.isNullOrEmpty(status.error), getCommittedTime());
 
     if (result.is_recording)
     {
@@ -335,7 +305,7 @@ function previewPlayback(playButton)
 
 function previewPlaybackOnComplete(status)
 {
-    if (isNullOrEmpty(status.error))
+    if (String.isNullOrEmpty(status.error))
     {
         displayStatusMessage("Preview started successfully", false);
     }
@@ -363,7 +333,7 @@ function saveStartTime(saveButton)
 
 function saveStartTimeOnComplete(status)
 {
-    if (isNullOrEmpty(status.error))
+    if (String.isNullOrEmpty(status.error))
     {
         commitTime("committedTime");
         displayStatusMessage("Start time saved successfully", false);
@@ -411,7 +381,7 @@ function onBlur(inputControl)
         handleInvalid(inputControl);
         currentValue = "";
     }
-    if (isNullOrEmpty(currentValue) || formatted.value == storedValue)
+    if (String.isNullOrEmpty(currentValue) || formatted.value == storedValue)
     {
         thisJQuery.val(storedValue);
         if (!thisJQuery.attr("uncommitted"))

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import logging
 
 import flask
 from flask import Flask
@@ -10,6 +11,11 @@ import rtp
 
 app = Flask(__name__)
 rtpplay = rtp.RTPPlay()
+
+# set up logging
+RECEIVER_LOG_FILENAME = "receiver.log"
+logging.basicConfig(filename=RECEIVER_LOG_FILENAME, level=logging.NOTSET)
+log = logging.getLogger("receiver")
 
 glob = util.ThreadedDataStore()
 
@@ -36,6 +42,8 @@ def load_commit_time(filename, extension="time"):
     'filename' is the name of a video file founnd in the dump directory.
     """
     
+    log.debug("load_commit_time(%s, %s)" % (filename, extension))
+
     dump_file = os.path.join(SYNC_DIR, filename + "." + extension)
     
     # read file time, or 0 if we couldn't
@@ -54,6 +62,7 @@ def load_commit_time(filename, extension="time"):
     
 @app.route("/")
 def hello():
+    log.debug("called /")
     return "Receiver Web"
 
 @app.route("/stop")
@@ -62,7 +71,9 @@ def stop():
     End playback of any currently running processes.  If none are running,
     it still returns success.
     """
-    
+
+    log.debug("called /stop")
+
     # stop works even on a non-running process
     rtpplay.stop()
     
@@ -79,6 +90,8 @@ def get_file_list(extension="time"):
     Returns a list of files found in the dump directory.
     """
     
+    log.debug("called /get_file_list")
+
     # try to fill the list with files in the given path
     dirlist = []
     if os.path.exists(DUMP_DIR):
@@ -108,6 +121,8 @@ def arm(file_name):
     the file and was not already playing, otherwise an error.
     """
     
+    log.debug("called /arm/%s" % file_name)
+
     # don't arm again if already running
     if rtpplay.isalive():
         return flask.jsonify(warning="rtpplay is already running.")
@@ -139,6 +154,8 @@ def play():
     """
     Starts the actual playback queued up by the arm process.
     """
+
+    log.debug("called /play")
     
     # warn if rtpplay is not yet running
     if not rtpplay.isalive():
@@ -159,6 +176,8 @@ def get_status():
     Returns helpful status information.
     """
     
+    log.debug("called /get_status")
+
     with glob:
         retfile = None
         if "armed_file" in glob and glob["armed_file"] is not None:

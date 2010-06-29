@@ -1,11 +1,11 @@
 <html>
 <head>
     <title>Live Stream Recorder</title>
-    <script type="text/javascript" src="Scripts/Common.js"></script>
-    <script type="text/javascript" src="Scripts/Recorder.js"></script>
-    <script type="text/javascript" src="Scripts/jquery-1.4.1.js"></script>
-    <link rel="stylesheet" type="text/css" href="Styles/Common.css" />
-    <link rel="stylesheet" type="text/css" href="Styles/Recorder.css" />
+    <script type="text/javascript" src="../common/scripts/common.js"></script>
+    <script type="text/javascript" src="../common/scripts/jquery-1.4.1.js"></script>
+    <script type="text/javascript" src="scripts/recorder.js"></script>
+    <link rel="stylesheet" type="text/css" href="../common/styles/Common.css" />
+    <link rel="stylesheet" type="text/css" href="styles/Recorder.css" />
 </head>
 <body style="display: none;">
     <div id="statusPanel" class="status" style="display: none">
@@ -17,14 +17,14 @@
             <div id="elapsedTime" class="elapsedTime">
             </div>
             <div id="buttonPanel" class="buttonPanel">
-                <img id="record" alt="Start Recording" class="button" src="Images/white/record.png"
-                    normalsrc="Images/white/record.png" onmouseoversrc="Images/blue/record.png"
-                    onmousedownsrc="Images/red/record.png" disabledsrc="Images/black/record.png"
+                <img id="record" alt="Start Recording" class="button" src="../common/images/white/record.png"
+                    normalsrc="../common/images/white/record.png" onmouseoversrc="../common/images/blue/record.png"
+                    onmousedownsrc="../common/images/red/record.png" disabledsrc="../common/images/black/record.png"
                     onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
                     onclick="startRecording(this)" />
-                <img id="stop" alt="Stop Recording" class="button"src="Images/white/stop.png"
-                    normalsrc="Images/white/stop.png" onmouseoversrc="Images/blue/stop.png"
-                    onmousedownsrc="Images/red/stop.png" disabledsrc="Images/black/stop.png"
+                <img id="stop" alt="Stop Recording" class="button"src="../common/images/white/stop.png"
+                    normalsrc="../common/images/white/stop.png" onmouseoversrc="../common/images/blue/stop.png"
+                    onmousedownsrc="../common/images/red/stop.png" disabledsrc="../common/images/black/stop.png"
                     onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
                     onclick="stopRecording(this)" />
             </div>
@@ -39,14 +39,14 @@
             <input type="text" id="committedTime" class="committedTime" onfocus="onFocus(this);" onblur="onBlur(this);" />
             <p class="label">Preview Length</p>
             <input type="text" id="duration" class="uncommittedTime" onchange="" />
-            <img id="preview" alt="Preview" class="button" src="Images/white/play.png"
-                    normalsrc="Images/white/play.png" onmouseoversrc="Images/blue/play.png"
-                    onmousedownsrc="Images/red/play.png" disabledsrc="Images/black/play.png"
+            <img id="preview" alt="Preview" class="button" src="../common/images/white/play.png"
+                    normalsrc="../common/images/white/play.png" onmouseoversrc="../common/images/blue/play.png"
+                    onmousedownsrc="../common/images/red/play.png" disabledsrc="../common/images/black/play.png"
                 onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
                 onclick="previewPlayback(this)" />
-            <img id="save" alt="Save Start Time" class="button" src="Images/white/plus.png"
-                    normalsrc="Images/white/plus.png" onmouseoversrc="Images/blue/plus.png"
-                    onmousedownsrc="Images/red/plus.png" disabledsrc="Images/black/plus.png"
+            <img id="save" alt="Save Start Time" class="button" src="../common/images/white/plus.png"
+                    normalsrc="../common/images/white/plus.png" onmouseoversrc="../common/images/blue/plus.png"
+                    onmousedownsrc="../common/images/red/plus.png" disabledsrc="../common/images/black/plus.png"
                 onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
                 onclick="saveStartTime(this)" />
         </div>

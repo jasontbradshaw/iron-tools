@@ -8,15 +8,10 @@ from flask import Flask
 import util
 import rtp
 
-"""
---WHITEBOARD--
-get_file_list -> json[]
-play_file(file_name)
-get_status -> json (i.e. downloading,startime)
-"""
-
 app = Flask(__name__)
 rtpplay = rtp.RTPPlay()
+
+glob = util.ThreadedDataStore()
 
 # config variables
 RTPPLAY_ADDRESS = "10.98.0.81"
@@ -70,6 +65,11 @@ def stop():
     
     # stop works even on a non-running process
     rtpplay.stop()
+    
+    # mark playback as stopped
+    with glob:
+        glob["is_playing"] = False
+        glob["armed_file"] = None
     
     return flask.jsonify()
 
@@ -128,6 +128,10 @@ def arm(file_name):
     if not rtpplay.isalive():
         return flask.jsonify(error="rtpplay did not start correctly.")
     
+    # save file name for get_status
+    with glob:
+        glob["armed_file"] = file_name
+    
     return flask.jsonify()
 
 @app.route("/play")
@@ -143,6 +147,10 @@ def play():
     # send the signal to start playback
     rtpplay.begin_playback()
     
+    # mark playback as started
+    with glob:
+        glob["is_playing"] = True
+    
     return flask.jsonify()
 
 @app.route("/get_status")
@@ -151,8 +159,16 @@ def get_status():
     Returns helpful status information.
     """
     
-    # TODO: implement status reporting
-    return flask.jsonify(playing=rtpplay.isalive())
+    with glob:
+        retfile = None
+        if "armed_file" in glob and glob["armed_file"] is not None:
+            retfile = glob["armed_file"]
+            
+        playing = False
+        if "is_playing" in glob and glob["is_playing"] is not None:
+            playing = glob["is_playing"]
+    
+    return flask.jsonify(file=retfile, is_playing=playing)
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"

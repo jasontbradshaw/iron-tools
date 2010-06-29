@@ -4,10 +4,6 @@ import json
 import time
 import re
 
-# before running create
-# /collector/dump
-# /receiver/dump
-
 class ReceiverWebTestCase(unittest.TestCase):
     def setUp(self):
         self.app = receiverweb.app.test_client()

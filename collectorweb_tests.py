@@ -3,13 +3,7 @@ import unittest
 import json
 import time
 
-# before running create
-# /collector/dump
-# /receiver/dump
-
 class CollectorWebTestCase(unittest.TestCase):
-
-		
 
     def setUp(self):
         self.app = collectorweb.app.test_client()
@@ -29,8 +23,6 @@ class CollectorWebTestCase(unittest.TestCase):
 
     #assert start record prevents double starting
     def test_02_record(self):
-	
-
         rv = self.app.get('/start_record')
         assert '{}' in rv.data
 
@@ -42,7 +34,6 @@ class CollectorWebTestCase(unittest.TestCase):
 
     #asserts the time is being tracked properly
     def test_03_elapsed_time(self):       
-
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert js['elapsed_time'] == '0'
@@ -64,9 +55,9 @@ class CollectorWebTestCase(unittest.TestCase):
         assert 3 <= t2 - t1 <= 4    # close enough
         
         self.app.get('/stop_record')
+
     #asserts that commit works correctly for nzp values
     def test_04_commit(self):
-
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'commit_time' in js
@@ -96,7 +87,6 @@ class CollectorWebTestCase(unittest.TestCase):
 
     #assert play preview funtions properly with nzp values
     def test_05_play_preview(self):
-        
         rv = self.app.get('/play_preview/30')
         js = json.loads(rv.data)
         assert 'error' in js
@@ -124,10 +114,6 @@ class CollectorWebTestCase(unittest.TestCase):
 
         rv = self.app.get('/play_preview/10/-10')
         assert '{}' in rv.data
-
-
-
-
 
 if __name__ == '__main__':
     unittest.main()

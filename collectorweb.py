@@ -26,7 +26,7 @@ rtpplay = rtp.RTPPlay()
 
 # config variables
 RTPDUMP_ADDRESS = "0.0.0.0"
-RTPDUMP_PORT = 5004
+RTPDUMP_PORT = 5006
 
 # where dump preview gets sent
 RTPPLAY_PREVIEW_ADDRESS = "10.98.0.81"
@@ -216,4 +216,4 @@ def play_preview(start_time, duration=30):
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(host="127.0.0.1", port=5081, debug=True)
+    app.run(host="0.0.0.0", port=81, debug=True)

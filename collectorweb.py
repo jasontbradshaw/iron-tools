@@ -2,6 +2,7 @@
 
 import os
 import time
+import logging
 
 import flask
 from flask import Flask
@@ -10,6 +11,11 @@ import util
 import rtp
 
 app = Flask(__name__)
+
+# set up logging
+COLLECTOR_LOG_FILENAME = "collector.log"
+logging.basicConfig(filename=COLLECTOR_LOG_FILENAME, level=logging.NOTSET)
+log = logging.getLogger("collector")
 
 # always access the datastore's contents with a 'with' statement!
 glob = util.ThreadedDataStore()
@@ -52,6 +58,8 @@ def write_commit_file(filename, t, extension="time"):
     sync directory.
     """
     
+    log.debug("write_commit_file(%s, %d, %s)" % (filename, t, extension))
+
     # write the time to its file
     commit_file = os.path.join(SYNC_DIR, filename + "." + extension)
     with open(commit_file, 'w') as f:
@@ -59,6 +67,7 @@ def write_commit_file(filename, t, extension="time"):
 
 @app.route("/")
 def hello():
+    log.debug("called /")
     return "Collector Web"
 
 @app.route("/start_record")
@@ -66,6 +75,7 @@ def start_record():
     """
     Starts the recording process.
     """
+    log.debug("called /start_record")
     
     # save the time we started recording, clear previous commit time
     with glob:
@@ -98,6 +108,8 @@ def stop_record():
     Stops the recording process and sets the start time back to 'None'.
     """
     
+    log.debug("called /stop_record")
+
     rtpdump.stop()
 
     # save the final status for return after varaible reset
@@ -116,6 +128,8 @@ def get_record_status():
     a recording is happending, and what the commit time is set to.
     """
     
+    log.debug("called /get_record_status")
+
     # retrieve commit time, elapsed time, and recording status
     with glob:
         commit_time = 0
@@ -139,6 +153,8 @@ def commit_time(t):
     all clients.
     """
     
+    log.debug("called /commit_time/%d" % t)
+
     # set commit time
     with glob:
         # make sure 
@@ -164,6 +180,8 @@ def play_preview(start_time, duration=30):
     """
     RTPPlay duration seconds of the current dump starting at time start_time.
     """
+
+    log.debug("called /play_preview/%d/%d" % (start_time, duration))
 
     # get last started record
     with glob:

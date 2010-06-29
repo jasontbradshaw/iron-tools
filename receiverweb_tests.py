@@ -6,7 +6,7 @@ import re
 
 # before running create
 # /collector/dump
-# /reciever/dump
+# /receiver/dump
 
 class ReceiverWebTestCase(unittest.TestCase):
     def setUp(self):

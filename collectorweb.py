@@ -52,18 +52,27 @@ Conventions:
   - Returning the empty JSON object {} signifies success.
 """
 
+def logthis(target):
+    def modified_target(*args, **kwargs):
+        log.debug("entering %s." % target.func_name)
+        r = target(args, kwargs)
+        log.debug("leaving %s." % target.func_name)
+        return r
+    return modified_target
+    
+
+@logthis
 def write_commit_file(filename, t, extension="time"):
     """
     Writes the given time to the given dump file name and saves it to the
     sync directory.
     """
     
-    log.debug("write_commit_file(%s, %d, %s)" % (filename, t, extension))
-
     # write the time to its file
     commit_file = os.path.join(SYNC_DIR, filename + "." + extension)
     with open(commit_file, 'w') as f:
         f.write(str(t))
+        log.debug("write_commit_file: file written.")
 
 @app.route("/")
 def hello():
@@ -84,6 +93,7 @@ def start_record():
     
     # if rtpdump is already started, return
     if rtpdump.isalive():
+        log.debug("start_record: rtpdump already running.")
         return flask.jsonify(warning="rtpdump already running.")
     
     # try to start it, but return an error if it doesn't succeed
@@ -98,6 +108,7 @@ def start_record():
         if not rtpdump.isalive():
             raise Exception("Failed to start rtpdump.")
     except Exception as e:
+        log.error("start_record: %s" % str(e))
         return flask.jsonify(error=str(e))
     
     return flask.jsonify()
@@ -186,6 +197,7 @@ def play_preview(start_time, duration=30):
     # get last started record
     with glob:
         if "dump_file" not in glob:
+            log.info("play_preview: no recording started, unable to preview.")
             return flask.jsonify(
                 error="no recording started, unable to preview.")
         
@@ -193,8 +205,9 @@ def play_preview(start_time, duration=30):
     
     # ensure the file exists
     if not os.path.exists(dump_file):
-        return flask.jsonify(error="Could not find file '%s'." %
-                dump_file)
+        errmsg = "play_preview: could not find file '%s'." % dump_file
+        log.info(errmsg)
+        return flask.jsonify(errmsg)
     
     # stop the current preview
     rtpplay.stop()

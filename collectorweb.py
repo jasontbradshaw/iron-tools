@@ -61,7 +61,6 @@ def logthis(target):
     return modified_target
     
 
-@logthis
 def write_commit_file(filename, t, extension="time"):
     """
     Writes the given time to the given dump file name and saves it to the

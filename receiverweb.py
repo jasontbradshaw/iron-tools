@@ -47,18 +47,19 @@ def load_commit_time(filename, extension="time"):
     dump_file = os.path.join(SYNC_DIR, filename + "." + extension)
     
     # read file time, or 0 if we couldn't
+    num = 0
     try:
         with open(dump_file, 'r') as f:
             num = int(f.read())
     except OSError:
-        pass
+        num = None
     except ValueError:
-        pass
+        num = None
     except IOError:
-        pass
+        num = None
     
-    # return the default value if we failed to get the time for any reason
-    return 0
+    # return 'None' if we failed to get the time for any reason
+    return num
     
 @app.route("/")
 def index():
@@ -110,8 +111,13 @@ def get_file_list(extension="time"):
         commit_file = os.path.join(SYNC_DIR, f + "." + extension)
         commit_time_found = os.path.exists(commit_file)
         
-        # add them all to the list as a tuple of (filename, found time?, size)
-        results.append((f, commit_time_found, size))
+        # add them all to the list as a dict of attributes (jsonify turns it into
+        # a javascript object)
+        status_obj = {"filename": f,
+                      "start_time_received": commit_time_found,
+                      "file_size": size}
+        
+        results.append(status_obj)
     
     return flask.jsonify(file_list=results)
 
@@ -136,6 +142,9 @@ def arm(file_name):
     
     # get the commit time from file
     commit_time = load_commit_time(file_name)
+    
+    if commit_time is None:
+        return flask.jsonify(error="commit_time could not be loaded.")
     
     # attempt to play the given file
     rtpplay.start(path, RTPPLAY_ADDRESS, RTPPLAY_PORT, start_time=commit_time,
@@ -192,4 +201,4 @@ def get_status():
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"
-    app.run(host="127.0.0.1", port=5082, debug=True)
+    app.run(host="0.0.0.0", port=82, debug=True)

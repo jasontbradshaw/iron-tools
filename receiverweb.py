@@ -61,9 +61,10 @@ def load_commit_time(filename, extension="time"):
     return 0
     
 @app.route("/")
-def hello():
+def index():
     log.debug("called /")
-    return "Receiver Web"
+    
+    return flask.redirect("/static/receiver/index.html")
 
 @app.route("/stop")
 def stop():

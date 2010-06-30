@@ -66,9 +66,10 @@ def write_commit_file(filename, t, extension="time"):
         f.write(str(t))
 
 @app.route("/")
-def hello():
+def index():
     log.debug("called /")
-    return "Collector Web"
+    
+    return flask.redirect("/static/collector/index.html")
 
 @app.route("/start_record")
 def start_record():

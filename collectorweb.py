@@ -52,20 +52,14 @@ Conventions:
   - Returning the empty JSON object {} signifies success.
 """
 
-def logthis(target):
-    def modified_target(*args, **kwargs):
-        log.debug("entering %s." % target.func_name)
-        r = target(args, kwargs)
-        log.debug("leaving %s." % target.func_name)
-        return r
-    return modified_target
-    
-@logthis
 def write_commit_file(filename, t, extension="time"):
     """
     Writes the given time to the given dump file name and saves it to the
     sync directory.
     """
+    
+    log.debug("called write_commit_file(%s, %s, %s)" %
+              (str(filename), str(t), str(extension))
     
     # write the time to its file
     commit_file = os.path.join(SYNC_DIR, filename + "." + extension)

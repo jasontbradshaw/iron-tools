@@ -86,15 +86,15 @@ def start_record():
     """
     log.debug("called /start_record")
     
-    # save the time we started recording, clear previous commit time
-    with glob:
-        glob["start_time"] = util.time()
-        glob["commit_time"] = None
-    
     # if rtpdump is already started, return
     if rtpdump.isalive():
         log.debug("start_record: rtpdump already running.")
         return flask.jsonify(warning="rtpdump already running.")
+    
+    # save the time we started recording, clear previous commit time
+    with glob:
+        glob["start_time"] = util.time()
+        glob["commit_time"] = None
     
     # try to start it, but return an error if it doesn't succeed
     try:

@@ -14,17 +14,19 @@ class CollectorWebTestCase(unittest.TestCase):
     #asserts starting conditions are correct
     def test_01_test(self):
         rv = self.app.get('/')
-        assert 'Collector Web' in rv.data
+        assert '/static/collector/index.html' in rv.data
         rv = self.app.get('/stop_record')
 	js = json.loads(rv.data)
-        assert js['is_recording'] == False
         assert js['seconds_elapsed'] == 0
         assert js['committed_time'] == 0
+        assert js['is_recording'] == False
 
     #assert start record prevents double starting
     def test_02_record(self):
         rv = self.app.get('/start_record')
-        assert '{}' in rv.data
+        with collectorweb.glob:
+            assert 'start_time' in collectorweb.glob
+            assert collectorweb.glob['commit_time'] == None
 
         rv = self.app.get('/start_record')
         js = json.loads(rv.data)
@@ -36,22 +38,24 @@ class CollectorWebTestCase(unittest.TestCase):
     def test_03_elapsed_time(self):       
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert js['elapsed_time'] == '0'
+        assert ('elapsed_time' not in rv.data) or (js['elapsed_time'] == '0')
 
         rv = self.app.get('/start_record')
-        assert '{}' in rv.data
+        with collectorweb.glob:
+            assert 'start_time' in collectorweb.glob
+            assert collectorweb.glob['commit_time'] == None
 
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert 'elapsed_time' in js
-        t1 = int(js['elapsed_time'])
+        assert 'seconds_elapsed' in js
+        t1 = int(js['seconds_elapsed'])
 
         time.sleep(3)
 
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert 'elapsed_time' in js
-        t2 = int(js['elapsed_time'])
+        assert 'seconds_elapsed' in js
+        t2 = int(js['seconds_elapsed'])
         assert 3 <= t2 - t1 <= 4    # close enough
         
         self.app.get('/stop_record')

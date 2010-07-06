@@ -2,6 +2,7 @@ import receiverweb
 import unittest
 import json
 import time
+import util
 import re
 
 class ReceiverWebTestCase(unittest.TestCase):
@@ -10,12 +11,16 @@ class ReceiverWebTestCase(unittest.TestCase):
 
     def test_home(self):
         rv = self.app.get('/')
-        assert 'Receiver Web' in rv.data
+        assert '/static/receiver/index.html' in rv.data
 
     # assert that stop does nothing if nothing is playing
+    # assert that flags are properly set after stopped
     def test_stop(self):
         rv = self.app.get('/stop')
         assert '{}' in rv.data
+        with receiverweb.glob:
+            assert receiverweb.glob['is_playing'] == False
+            assert receiverweb.glob['armed_file'] == None
 
     # assert nothing is in the list if the directory is empty
     def test_get_file_list(self):
@@ -24,9 +29,9 @@ class ReceiverWebTestCase(unittest.TestCase):
         assert 'file_list' in js
         assert js['file_list'] == []
 
-    def test_commit_time_1(self):
+    def test_commit_time(self):
         result = receiverweb.load_commit_time('fake_test')
-        assert result == 0
+        assert result == None
 
      # asserts that fake_test.dump did not exist and proper error was returned
     def test_arm(self):
@@ -48,7 +53,8 @@ class ReceiverWebTestCase(unittest.TestCase):
     def test_get_status(self):
         rv = self.app.get('/get_status')
         js = json.loads(rv.data)
-        assert js['playing'] == False
+        assert js['file'] == None
+        assert js['is_playing'] == False
 
 if __name__ == '__main__':
     unittest.main()

@@ -59,7 +59,7 @@ def write_commit_file(filename, t, extension="time"):
     """
     
     log.debug("called write_commit_file(%s, %s, %s)" %
-              (str(filename), str(t), str(extension))
+              (str(filename), str(t), str(extension)))
     
     # write the time to its file
     commit_file = os.path.join(SYNC_DIR, filename + "." + extension)

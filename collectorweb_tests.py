@@ -9,7 +9,7 @@ class CollectorWebTestCase(unittest.TestCase):
         self.app = collectorweb.app.test_client()
 
     def tearDown(self):
-        pass
+        del self.app
 
     #asserts starting conditions are correct
     def test_root(self):
@@ -17,7 +17,7 @@ class CollectorWebTestCase(unittest.TestCase):
         assert '/static/collector/index.html' in rv.data
         
         rv = self.app.get('/stop_record')
-	js = json.loads(rv.data)
+        js = json.loads(rv.data)
         assert js['seconds_elapsed'] == 0
         assert js['committed_time'] == 0
         assert js['is_recording'] == False
@@ -88,24 +88,27 @@ class CollectorWebTestCase(unittest.TestCase):
         self.app.get('/stop_record')
 
     #assert play preview funtions properly with nzp values
-    def test_play_preview(self):
+    def test_play_preview_initial(self):
         rv = self.app.get('/play_preview/30')
         js = json.loads(rv.data)
         assert 'error' in js
         assert js['error'] == "no recording started, unable to preview."
 
+
+		#assert play preview funtions properly with nzp values
+    def test_play_preview_param(self):
         self.app.get('/start_record')
 
-        rv = self.app.get('/play_preview/-100')
+        rv = self.app.get('/play_preview/10')
         assert '{}' in rv.data
 
         rv = self.app.get('/play_preview/0')
         assert '{}' in rv.data
 
-        rv = self.app.get('/play_preview/5')
+        rv = self.app.get('/play_preview/13371377')
         assert '{}' in rv.data
 
-        rv = self.app.get('/play_preview/13371337')
+        rv = self.app.get('/play_preview/-13371337')
         assert '{}' in rv.data
 
         rv = self.app.get('/play_preview/10/0')

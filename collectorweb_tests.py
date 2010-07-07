@@ -61,30 +61,32 @@ class CollectorWebTestCase(unittest.TestCase):
         
         self.app.get('/stop_record')
 
-    #asserts that commit works correctly for nzp values
-    def test_commit(self):
+    def test_commit_base(self):
+        rv = self.app.get('/get_record_status')
+        js = json.loads(rv.data)
+    
+    def test_commit_nostart(self):
+        rv = self.app.get('/commit_time/0')
+        js = json.loads(rv.data)
+        assert "error" in js
+    
+    def test_commit_basic(self):
+        self.app.get("/start_record")
+        self.app.get("/stop_record")
         
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'committed_time' in js
         assert js['committed_time'] == 0
         
-        rv = self.app.get('/commit_time/0')
-        assert 'error' in rv.data
-
-        rv = self.app.get('/get_record_status')
-        js = json.loads(rv.data)
-        assert 'committed_time' in js
-        assert int(js['committed_time']) == 0
-
         rv = self.app.get('/commit_time/98765')
         assert '{}' in rv.data
-
+        
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'committed_time' in js
         assert int(js['committed_time']) == 98765
-
+        
         self.app.get('/stop_record')
 
     #assert play preview funtions properly with nzp values
@@ -121,4 +123,5 @@ class CollectorWebTestCase(unittest.TestCase):
         assert '{}' in rv.data
 
 if __name__ == '__main__':
-    unittest.main()
+    suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTestCase)
+    unittest.TextTestRunner(verbosity=2).run(suite)

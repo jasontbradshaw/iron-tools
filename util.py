@@ -43,7 +43,7 @@ def generate_file_name(basename, extension="dump"):
     timeformat = "%Y-%m-%d_%H:%M:%S"
     
     # create the file name in format: <timestamp><basename>.<extension>
-    return time.strftime(timeformat) + basename + "." + extension
+    return t.strftime(timeformat) + basename + "." + extension
 
 class UnlockedAccessError(Exception):
     """

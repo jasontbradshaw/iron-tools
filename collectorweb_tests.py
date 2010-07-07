@@ -30,7 +30,8 @@ class CollectorWebTestCase(unittest.TestCase):
 
         rv = self.app.get('/start_record')
         js = json.loads(rv.data)
-        assert js['warning'] == "rtpdump already running."
+        # TODO: this is broken for some unknown reason
+        assert js['warning'] == 'rtpdump already running.'
 
         self.app.get('/stop_record')
 

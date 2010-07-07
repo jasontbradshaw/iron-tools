@@ -132,18 +132,21 @@ def arm(file_name):
 
     # don't arm again if already running
     if rtpplay.isalive():
+        log.warning("arm: rtpplay already running")
         return flask.jsonify(warning="rtpplay is already running.")
     
     path = os.path.join(DUMP_DIR, file_name)
     
     # ensure the file exists
     if not os.path.isfile(path):
-        return flask.jsonify(error="Could not find file '%s'." % file_name)
+        log.error("arm: could not find file '%s'." % file_name)
+        return flask.jsonify(error="could not find file '%s'." % file_name)
     
     # get the commit time from file
     commit_time = load_commit_time(file_name)
     
     if commit_time is None:
+        log.error("arm: no commit time found")
         return flask.jsonify(error="commit_time could not be loaded.")
     
     # attempt to play the given file
@@ -151,6 +154,7 @@ def arm(file_name):
                   wait_start=True)
     
     if not rtpplay.isalive():
+        log.error("arm: rtpplay did not start correctly")
         return flask.jsonify(error="rtpplay did not start correctly.")
     
     # save file name for get_status
@@ -169,6 +173,7 @@ def play():
     
     # warn if rtpplay is not yet running
     if not rtpplay.isalive():
+        log.warning("play: rtpplay not running, no newline sent to process")
         return flask.jsonify(warning="rtpplay is not alive, no signal sent.")
     
     # send the signal to start playback
@@ -201,4 +206,4 @@ def get_status():
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"
-    app.run(host="0.0.0.0", port=82, debug=True)
+    app.run(host="0.0.0.0", port=5082, debug=True)

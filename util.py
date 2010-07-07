@@ -1,11 +1,38 @@
-import time as t
+import time
 import threading
 
-def time():
+def get_time():
     """
     Platform independent time based on an integer seconds.
     """
-    return int(t.time())
+    return int(time.time())
+
+def block_while(condition_func, max_time, invert=False):
+    """
+    Waits until the given function returns 'True' (or 'False' if
+    invert=True), then returns whether the condition was met before
+    the maximum allotted time.
+    """
+    
+    # did we finish before the maximum time?
+    success = True
+    
+    end_time = time.time() + max_time
+    
+    # flip the conditional function's test if specified
+    if invert:
+        condition_func = lambda: not condition_func()
+    
+    # wait until the condition function returns 'True' or exceeds its time
+    while not condition_func():
+        # we exceeded the maximum allotted time
+        if time.time() > end_time:
+            success = False
+            break
+        
+        time.sleep(iter_time)
+    
+    return success
 
 def generate_file_name(basename, extension="dump"):
     """

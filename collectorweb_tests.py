@@ -63,30 +63,30 @@ class CollectorWebTestCase(unittest.TestCase):
 
     #asserts that commit works correctly for nzp values
     def test_04_commit(self):
+        
+        # TODO: this entire test is broken, and does not conform to API specs
+        raise NotImplementedError("commit_time test is broken")
+        
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert 'commit_time' in js
-        assert js['commit_time'] == 0
-
-        rv = self.app.get('/commit_time/-5')
-        js = json.loads(rv.data)
-        assert 'error' in js
-
+        assert 'committed_time' in js
+        assert js['committed_time'] == 0
+        
         rv = self.app.get('/commit_time/0')
-        assert '{}' in rv.data
+        assert 'error' in rv.data
 
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert 'commit_time' in js
-        assert int(js['commit_time']) == 0
+        assert 'committed_time' in js
+        assert int(js['committed_time']) == 0
 
         rv = self.app.get('/commit_time/98765')
         assert '{}' in rv.data
 
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert 'commit_time' in js
-        assert int(js['commit_time']) == 98765
+        assert 'committed_time' in js
+        assert int(js['committed_time']) == 98765
 
         self.app.get('/stop_record')
 

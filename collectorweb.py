@@ -78,6 +78,7 @@ def start_record():
     """
     Starts the recording process.
     """
+    
     log.debug("called /start_record")
     
     # if rtpdump is already started, return
@@ -87,7 +88,7 @@ def start_record():
     
     # save the time we started recording, clear previous commit time
     with glob:
-        glob["start_time"] = util.time()
+        glob["start_time"] = util.get_time()
         glob["commit_time"] = None
     
     # try to start it, but return an error if it doesn't succeed
@@ -114,9 +115,9 @@ def stop_record():
     """
     
     log.debug("called /stop_record")
-
+    
     rtpdump.stop()
-
+    
     # save the final status for return after varaible reset
     final_status = get_record_status()
     
@@ -143,7 +144,7 @@ def get_record_status():
         
         elapsed_time = 0
         if "start_time" in glob and glob["start_time"] is not None:
-            elapsed_time = util.time() - glob["start_time"]
+            elapsed_time = util.get_time() - glob["start_time"]
     
     is_recording = rtpdump.isalive()
     
@@ -164,6 +165,7 @@ def commit_time(t):
     with glob:
         # make sure 
         if "dump_file" not in glob:
+            log.error("commit_time: no file was recording, no time set.")
             return flask.jsonify(
                 error="no currently recording file, no commit time set.")
         
@@ -199,27 +201,30 @@ def play_preview(start_time, duration=30):
     
     # ensure the file exists
     if not os.path.exists(dump_file):
-        errmsg = "play_preview: could not find file '%s'." % dump_file
-        log.info(errmsg)
-        return flask.jsonify(errmsg)
+        log.error("play_preview: could not find file '%s'." % dump_file)
+        return flask.jsonify(error="could not find file '%s'" % dump_file)
     
     # stop the current preview
     rtpplay.stop()
     
-    # wait until it dies before starting another
-    while rtpplay.isalive():
-        time.sleep(0.001)
+    # wait until it dies before starting another, but only to a limit
+    if not util.block_until(rtpplay.isalive, 3, invert=True):
+        log.error("play_preview: rtpplay took too long to stop.")
+        return flask.jsonify(
+            error="rtpplay did not stop in a reasonable amount of time")
     
     # attempt to play the given file
     rtpplay.start(dump_file, RTPPLAY_PREVIEW_ADDRESS,
             RTPPLAY_PREVIEW_PORT, start_time=start_time,
             end_time=start_time + duration)
     
-    if not rtpplay.isalive():
+    # wait until it starts, or fails to start
+    if not block_until(rtpplay.isalive, 1):
+        log.error("play_preview: rtpplay did not start correctly.")
         return flask.jsonify(error="rtpplay is not alive")
     
     return flask.jsonify()
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"
-    app.run(host="0.0.0.0", port=81, debug=True)
+    app.run(host="0.0.0.0", port=5081, debug=True)

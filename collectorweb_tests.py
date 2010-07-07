@@ -38,7 +38,7 @@ class CollectorWebTestCase(unittest.TestCase):
     def test_03_elapsed_time(self):       
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
-        assert ('elapsed_time' not in rv.data) or (js['elapsed_time'] == '0')
+        assert js['seconds_elapsed'] == 0
 
         rv = self.app.get('/start_record')
         with collectorweb.glob:

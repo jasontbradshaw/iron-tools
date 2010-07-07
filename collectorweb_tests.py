@@ -12,9 +12,10 @@ class CollectorWebTestCase(unittest.TestCase):
         pass
 
     #asserts starting conditions are correct
-    def test_01_test(self):
+    def test_root(self):
         rv = self.app.get('/')
         assert '/static/collector/index.html' in rv.data
+        
         rv = self.app.get('/stop_record')
 	js = json.loads(rv.data)
         assert js['seconds_elapsed'] == 0
@@ -22,7 +23,7 @@ class CollectorWebTestCase(unittest.TestCase):
         assert js['is_recording'] == False
 
     #assert start record prevents double starting
-    def test_02_record(self):
+    def test_record(self):
         rv = self.app.get('/start_record')
         with collectorweb.glob:
             assert 'start_time' in collectorweb.glob
@@ -30,13 +31,12 @@ class CollectorWebTestCase(unittest.TestCase):
 
         rv = self.app.get('/start_record')
         js = json.loads(rv.data)
-        print js
         assert js['warning'] == "rtpdump already running."
 
         self.app.get('/stop_record')
 
     #asserts the time is being tracked properly
-    def test_03_elapsed_time(self):       
+    def test_elapsed_time(self):
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert js['seconds_elapsed'] == 0
@@ -62,10 +62,7 @@ class CollectorWebTestCase(unittest.TestCase):
         self.app.get('/stop_record')
 
     #asserts that commit works correctly for nzp values
-    def test_04_commit(self):
-        
-        # TODO: this entire test is broken, and does not conform to API specs
-        raise NotImplementedError("commit_time test is broken")
+    def test_commit(self):
         
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
@@ -91,7 +88,7 @@ class CollectorWebTestCase(unittest.TestCase):
         self.app.get('/stop_record')
 
     #assert play preview funtions properly with nzp values
-    def test_05_play_preview(self):
+    def test_play_preview(self):
         rv = self.app.get('/play_preview/30')
         js = json.loads(rv.data)
         assert 'error' in js

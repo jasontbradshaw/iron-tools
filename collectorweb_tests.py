@@ -3,7 +3,7 @@ import unittest
 import json
 import time
 
-class CollectorWebTestCase(unittest.TestCase):
+class CollectorWebTests(unittest.TestCase):
 
     def setUp(self):
         self.app = collectorweb.app.test_client()
@@ -123,5 +123,5 @@ class CollectorWebTestCase(unittest.TestCase):
         assert '{}' in rv.data
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTestCase)
+    suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

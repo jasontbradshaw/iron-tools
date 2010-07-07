@@ -99,9 +99,11 @@ def start_record():
         
         with glob:
             glob["dump_file"] = dump_file
-            
-        if not rtpdump.isalive():
+        
+        # give rtpdump a chance to start, and return an error if it didn't
+        if not util.block_until(rtpdump.isalive, 1, invert=True):
             raise Exception("Failed to start rtpdump.")
+        
     except Exception as e:
         log.error("start_record: %s" % str(e))
         return flask.jsonify(error=str(e))

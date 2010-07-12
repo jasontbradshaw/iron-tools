@@ -102,6 +102,7 @@ class CollectorWebTestCase(unittest.TestCase):
         self.app.get('/start_record')
 
         rv = self.app.get('/play_preview/10')
+        print rv.data
         assert '{}' in rv.data
 
         rv = self.app.get('/play_preview/0')

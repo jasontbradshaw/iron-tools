@@ -5,7 +5,7 @@ import time
 import util
 import re
 
-class ReceiverWebTestCase(unittest.TestCase):
+class ReceiverWebTests(unittest.TestCase):
     def setUp(self):
         self.app = receiverweb.app.test_client()
 
@@ -57,4 +57,5 @@ class ReceiverWebTestCase(unittest.TestCase):
         assert js['is_playing'] == False
 
 if __name__ == '__main__':
-    unittest.main()
+    suite = unittest.TestLoader().loadTestsFromTestCase(ReceiverWebTests)
+    unittest.TextTestRunner(verbosity=2).run(suite)

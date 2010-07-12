@@ -3,7 +3,7 @@ import unittest
 import json
 import time
 
-class CollectorWebTestCase(unittest.TestCase):
+class CollectorWebTests(unittest.TestCase):
 
     def setUp(self):
         self.app = collectorweb.app.test_client()
@@ -40,19 +40,19 @@ class CollectorWebTestCase(unittest.TestCase):
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert js['seconds_elapsed'] == 0
-
+        
         rv = self.app.get('/start_record')
         with collectorweb.glob:
             assert 'start_time' in collectorweb.glob
             assert collectorweb.glob['commit_time'] == None
-
+        
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'seconds_elapsed' in js
         t1 = int(js['seconds_elapsed'])
-
+        
         time.sleep(3)
-
+        
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert 'seconds_elapsed' in js
@@ -97,7 +97,7 @@ class CollectorWebTestCase(unittest.TestCase):
         assert js['error'] == "no recording started, unable to preview."
 
 
-		#assert play preview funtions properly with nzp values
+    #assert play preview funtions properly with nzp values
     def test_play_preview_param(self):
         self.app.get('/start_record')
 
@@ -124,5 +124,5 @@ class CollectorWebTestCase(unittest.TestCase):
         assert '{}' in rv.data
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTestCase)
+    suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

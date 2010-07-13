@@ -67,15 +67,28 @@ def index():
     
     return flask.redirect("/static/receiver/index.html")
 
+@app.route("/dev")
+def devinterace():
+    
+    html = "Dev Interface<hr />"
+    
+    static_links = ["/get_file_list", "/stop", "/arm/test.dump", "/play",
+                    "/get_status"]
+    
+    for link in static_links:
+        html += '<a href="%s">%s</a><br />' % (link, link)
+    
+    return html
+
 @app.route("/stop")
 def stop():
     """
     End playback of any currently running processes.  If none are running,
     it still returns success.
     """
-
+    
     log.debug("called /stop")
-
+    
     # stop works even on a non-running process
     rtpplay.stop()
     

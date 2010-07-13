@@ -73,6 +73,24 @@ def index():
     
     return flask.redirect("/static/collector/index.html")
 
+@app.route("/dev")
+def devinterface():
+    """
+    A super-simple development interface for simple interaction with the
+    application.
+    """
+    
+    html = "Dev Interface<hr />"
+    
+    # static links we want to link to (those without parameters)
+    static_links = ["/start_record", "/stop_record", "/get_record_status",
+                    "/play_preview/0", "/commit_time/30"]
+    
+    for link in static_links:
+        html += '<a href="%s">%s</a><br />' % (link, link)
+    
+    return html
+    
 @app.route("/start_record")
 def start_record():
     """
@@ -101,7 +119,7 @@ def start_record():
             glob["dump_file"] = dump_file
         
         # give rtpdump a chance to start, and return an error if it didn't
-        if not util.block_until(rtpdump.isalive, 1, invert=True):
+        if not util.block_until(rtpdump.isalive, 1):
             raise Exception("Failed to start rtpdump.")
         
     except Exception as e:
@@ -137,7 +155,7 @@ def get_record_status():
     """
     
     log.debug("called /get_record_status")
-
+    
     # retrieve commit time, elapsed time, and recording status
     with glob:
         commit_time = 0
@@ -210,7 +228,7 @@ def play_preview(start_time, duration=30):
     rtpplay.stop()
     
     # wait until it dies before starting another, but only to a limit
-    if not util.block_until(rtpplay.isalive, 3, invert=True):
+    if not util.block_while(rtpplay.isalive, 3):
         log.error("play_preview: rtpplay took too long to stop.")
         return flask.jsonify(
             error="rtpplay did not stop in a reasonable amount of time")
@@ -221,7 +239,7 @@ def play_preview(start_time, duration=30):
             end_time=start_time + duration)
     
     # wait until it starts, or fails to start
-    if not block_until(rtpplay.isalive, 1):
+    if not util.block_until(rtpplay.isalive, 1):
         log.error("play_preview: rtpplay did not start correctly.")
         return flask.jsonify(error="rtpplay is not alive")
     

@@ -8,11 +8,8 @@ class CollectorWebTests(unittest.TestCase):
     def setUp(self):
         self.app = collectorweb.app.test_client()
 
-    def tearDown(self):
-        del self.app
-
     #asserts starting conditions are correct
-    def test_root(self):
+    def test03_root(self):
         rv = self.app.get('/')
         assert '/static/collector/index.html' in rv.data
         
@@ -23,17 +20,15 @@ class CollectorWebTests(unittest.TestCase):
         assert js['is_recording'] == False
 
     #assert start record prevents double starting
-    def test_record(self):
+    def test04_record(self):
         rv = self.app.get('/start_record')
-        with collectorweb.glob:
-            assert 'start_time' in collectorweb.glob
-            assert collectorweb.glob['commit_time'] == None
+        assert '{}' in rv.data
 
         rv = self.app.get('/start_record')
         js = json.loads(rv.data)
+        #for x in js:
+        #    print x + "   " + js[x]
         assert js['warning'] == "rtpdump already running."
-
-        self.app.get('/stop_record')
 
     #asserts the time is being tracked properly
     def test_elapsed_time(self):
@@ -42,9 +37,7 @@ class CollectorWebTests(unittest.TestCase):
         assert js['seconds_elapsed'] == 0
         
         rv = self.app.get('/start_record')
-        with collectorweb.glob:
-            assert 'start_time' in collectorweb.glob
-            assert collectorweb.glob['commit_time'] == None
+        assert '{}' in rv.data
         
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
@@ -58,14 +51,12 @@ class CollectorWebTests(unittest.TestCase):
         assert 'seconds_elapsed' in js
         t2 = int(js['seconds_elapsed'])
         assert 3 <= t2 - t1 <= 4    # close enough
-        
-        self.app.get('/stop_record')
 
     def test_commit_base(self):
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
     
-    def test_commit_nostart(self):
+    def test02_commit_nostart(self):
         rv = self.app.get('/commit_time/0')
         js = json.loads(rv.data)
         assert "error" in js
@@ -90,9 +81,8 @@ class CollectorWebTests(unittest.TestCase):
         self.app.get('/stop_record')
 
     #assert play preview funtions properly with nzp values
-    def test_play_preview_initial(self):
+    def test01_play_preview_initial(self):
         rv = self.app.get('/play_preview/30')
-        js = json.loads(rv.data)
         assert 'error' in js
         assert js['error'] == "no recording started, unable to preview."
 

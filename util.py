@@ -7,24 +7,34 @@ def get_time():
     """
     return int(time.time())
 
+def block_until(condition_func, max_time):
+    """
+    Waits until the given function returns 'False' or the maximum time
+    is exceeded, and returns whether the function returned 'True' or not.
+    """
+    
+    return block_while(condition_func, max_time, invert=True)
+
 def block_while(condition_func, max_time, invert=False):
     """
-    Waits until the given function returns 'True' (or 'False' if
+    Blocks while the given function returns 'True' (or 'False' if
     invert=True), then returns whether the condition was met before
     the maximum allotted time.
     """
-    
-    # did we finish before the maximum time?
-    success = True
     
     end_time = time.time() + max_time
     
     # flip the conditional function's test if specified
     if invert:
-        condition_func = lambda: not condition_func()
+        term_test = lambda: not condition_func()
+    else:
+        term_test = condition_func
+    
+    # did we finish before the maximum time?
+    success = True
     
     # wait until the condition function returns 'True' or exceeds its time
-    while not condition_func():
+    while term_test():
         # we exceeded the maximum allotted time
         if time.time() > end_time:
             success = False

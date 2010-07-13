@@ -206,6 +206,10 @@ static Notify_value play_handler(Notify_client client)
   if (first < 0 && wait_start == 1) {
     if (verbose)
       printf("Press enter to begin playback.\n");
+    
+    // touch a file to indicate having finished arming
+    fclose(fopen("armed", "w"));
+    
     getc(stdin);
   }
 

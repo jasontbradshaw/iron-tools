@@ -51,6 +51,28 @@ class RTPPlay(RTPTools):
         # path to 'rtpplay' binary
         self.path = path
         self.proc = None
+        
+        # the time the process was started
+        self.proc_start_time = None
+        
+        # the file where the armed status should exist
+        self.armed_file = os.path.join(os.path.dirname(self.path),
+                                       armed_dir, "armed")
+        
+        # clean up any previously existing armed file
+        self.remove_armed_file()
+        
+    def remove_armed_file(self):
+        """
+        Removes the 'armed' file if it exists as specified.  Returns 'True'
+        if the file was removed, 'False' otherwise.
+        """
+        
+        try:
+            os.remove(self.armed_file)
+            return True
+        except:
+            return False
     
     def start(self, inputfile, address, port, start_time=None, end_time=None,
               wait_start=False):
@@ -87,9 +109,28 @@ class RTPPlay(RTPTools):
                 DEVNULL = open(os.devnull, 'w')
                 self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL,
                                      stdin=sp.PIPE)
+                
+                # mark the time we started the process
+                self.proc_start_time = time.time()
         
         return self.pid()
     
+    def stop(self):
+        """
+        Kills the process launched by 'start'.
+        """
+        
+        if not self.isalive():
+            return
+        
+        self.proc.terminate()
+        
+        # remove last start time since we were just stopped
+        self.proc_start_time = None
+        
+        # clean up armed file
+        self.remove_armed_file()
+
     def begin_playback(self):
         """
         If rtpplay was started with waiting turned on, this sends the command
@@ -100,6 +141,23 @@ class RTPPlay(RTPTools):
         # send a newline to tell the process to start as soon as it can
         if self.isalive():
             self.proc.stdin.write("\n")
+    
+    def is_armed(self):
+        """
+        Determines if the currently armed file is done being armed.  Returns
+        'True' if this is the case, and 'False' if nothing has been played
+        or the file can't be found.
+        """
+        
+        # no start time or file doesn't exist
+        if self.proc_start_time is None or not os.path.exists(self.armed_file):
+            return False
+        # modification time of file is before most recent start time
+        elif os.path.getmtime(self.armed_file) < self.proc_start_time:
+            return False
+        
+        # otherwise, modification time was after we started the process
+        return True
     
 class RTPDump(RTPTools):
     """

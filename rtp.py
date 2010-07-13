@@ -100,7 +100,7 @@ class RTPPlay(RTPTools):
         # send a newline to tell the process to start as soon as it can
         if self.isalive():
             self.proc.stdin.write("\n")
-
+    
 class RTPDump(RTPTools):
     """
     Dumps an RTP stream to a file.

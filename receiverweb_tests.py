@@ -14,13 +14,14 @@ class ReceiverWebTests(unittest.TestCase):
         assert '/static/receiver/index.html' in rv.data
 
     # assert that stop does nothing if nothing is playing
-    # assert that flags are properly set after stopped
     def test2_stop(self):
         rv = self.app.get('/stop')
         assert '{}' in rv.data
-        with receiverweb.glob:
-            assert receiverweb.glob['is_playing'] == False
-            assert receiverweb.glob['armed_file'] == None
+        
+        rv2 = self.app.get('/get_status')
+        js2 = json.loads(rv2.data)
+        assert js2['file'] == None
+        assert js2['is_playing'] == False
 
     # assert that get_file_list returns a 'file_list'
     def test3_get_file_list(self):

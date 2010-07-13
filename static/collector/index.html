@@ -31,24 +31,28 @@
         </div>
     </div>
     <div id="previewPanel" class="panel">
-        <p class="panelTitle">
-            Preview Playback</p>
+        <h2 class="panelTitle">
+            Preview Playback</h2>
         <div class="panelBody">
-            <p class="label">
-                Start Time</p>
-            <input type="text" id="committedTime" class="committedTime" onfocus="onFocus(this);" onblur="onBlur(this);" />
-            <p class="label">Preview Length</p>
-            <input type="text" id="duration" class="uncommittedTime" onchange="" />
-            <img id="preview" alt="Preview" class="button" src="../common/images/white/play.png"
-                    normalsrc="../common/images/white/play.png" onmouseoversrc="../common/images/blue/play.png"
-                    onmousedownsrc="../common/images/red/play.png" disabledsrc="../common/images/black/play.png"
-                onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                onclick="previewPlayback(this)" />
-            <img id="save" alt="Save Start Time" class="button" src="../common/images/white/plus.png"
-                    normalsrc="../common/images/white/plus.png" onmouseoversrc="../common/images/blue/plus.png"
-                    onmousedownsrc="../common/images/red/plus.png" disabledsrc="../common/images/black/plus.png"
-                onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                onclick="saveStartTime(this)" />
+            <div>
+                <b>Start Time</b>
+                <input type="text" id="committedTime" class="committedTime" onfocus="onFocus(this);" onblur="onBlur(this);" />
+            </div>
+            <div>
+                <b>Preview Length (seconds)</b>
+                <input type="text" id="duration" class="uncommittedTime" onchange="" />
+                <br />
+                <img id="preview" alt="Preview" class="button" src="../common/images/white/play.png"
+                        normalsrc="../common/images/white/play.png" onmouseoversrc="../common/images/blue/play.png"
+                        onmousedownsrc="../common/images/red/play.png" disabledsrc="../common/images/black/play.png"
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                    onclick="previewPlayback(this)" />
+                <img id="save" alt="Save Start Time" class="button" src="../common/images/white/plus.png"
+                        normalsrc="../common/images/white/plus.png" onmouseoversrc="../common/images/blue/plus.png"
+                        onmousedownsrc="../common/images/red/plus.png" disabledsrc="../common/images/black/plus.png"
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                    onclick="saveStartTime(this)" />
+            </span>
         </div>
     </div>
     <script type="text/javascript">

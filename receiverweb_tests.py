@@ -50,12 +50,22 @@ class ReceiverWebTests(unittest.TestCase):
         js = json.loads(rv.data)
         assert js['warning'] == 'rtpplay is not alive, no signal sent.'
 
+        rv2 = self.app.get('/get_status')
+        js2 = json.loads(rv2.data)
+        assert js2['file'] == None
+        assert js2['is_playing'] == False
+
     # asserts that get_status returns False when nothing is playing
     def test7_get_status(self):
         rv = self.app.get('/get_status')
         js = json.loads(rv.data)
         assert js['file'] == None
         assert js['is_playing'] == False
+
+    # asserts that trying to load a fake commit time returns None
+    def test8_load_commit_time(self):
+        result = receiverweb.load_commit_time('fake_test')
+        assert result == None
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(ReceiverWebTests)

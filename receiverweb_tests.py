@@ -29,6 +29,7 @@ class ReceiverWebTests(unittest.TestCase):
         js = json.loads(rv.data)
         assert 'file_list' in js
 
+    # asserts that trying to load a fake commit time returns None
     def test4_commit_time(self):
         result = receiverweb.load_commit_time('fake_test')
         assert result == None
@@ -62,10 +63,21 @@ class ReceiverWebTests(unittest.TestCase):
         assert js['file'] == None
         assert js['is_playing'] == False
 
-    # asserts that trying to load a fake commit time returns None
-    def test8_load_commit_time(self):
-        result = receiverweb.load_commit_time('fake_test')
-        assert result == None
+    # assert the status remains unchanged after play and stop
+    def test8_play(self):
+        rv = self.app.get('/play')
+        js = json.loads(rv.data)
+
+        rv2 = self.app.get('/get_status')
+        js2 = json.loads(rv2.data)
+        assert js2['file'] == None
+        assert js2['is_playing'] == False
+
+        rv = self.app.get('/stop')
+        js = json.loads(rv.data)
+
+        assert js2['file'] == None
+        assert js2['is_playing'] == False
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(ReceiverWebTests)

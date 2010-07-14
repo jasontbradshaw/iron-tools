@@ -1,5 +1,7 @@
 *.pyc
 *~
+*.o
+*.log
 clean.sh
 rtpdump
 rtpplay

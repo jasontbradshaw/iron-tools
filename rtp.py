@@ -57,7 +57,7 @@ class RTPPlay(RTPTools):
         self.pollrtpplay = None
         
     def start(self, inputfile, address, port, start_time=None, end_time=None,
-              wait_start=False):
+              wait_start=False, verbose=True):
         """
         Start the rtpplay process with a file to play, an address, a port
         to play to, an optional time to start playing the stream from, and
@@ -86,6 +86,9 @@ class RTPPlay(RTPTools):
                 if wait_start:
                     args.append("-w")
                 
+                if verbose:
+                    args.append("-v")
+                
                 # add address/port string
                 args.extend(["%s/%d" % (address, port)])
         
@@ -93,15 +96,28 @@ class RTPPlay(RTPTools):
                 DEVNULL = open(os.devnull, 'w')
                 self.proc = sp.Popen(args, stderr=DEVNULL, stdout=sp.PIPE,
                                      stdin=sp.PIPE)
-                self.start_poll(self.proc.stdout) 
+                
+                # only start the polling thread if verbose output is enabled,
+                # since we can't determine the status without it.
+                if verbose:
+                    self.start_poll(self.proc.stdout)
                 
         return self.pid()
     
-    def start_poll(self, stdoutpipe):
+    def start_poll(self, stdout_pipe):
+        """
+        Starts the poll thread that reads from rtpplay's output to 
+        determine whether the process has finished arming or not.  If a
+        process exists, it stops and joins it before starting a new one.
+        """
+        
+        # kill the old thread if there is one running
         if self.pollrtpplay and self.pollrtpplay.is_alive():
             self.pollrtpplay.kill = True
             self.pollrtpplay.join()
-        self.pollrtpplay = PollRTPPlay(stdoutpipe)
+        
+        # make the new thread
+        self.pollrtpplay = PollRTPPlay(stdout_pipe)
         self.pollrtpplay.start()
 
     def stop(self):
@@ -111,6 +127,12 @@ class RTPPlay(RTPTools):
         
         # only kill the process if it's currently alive
         if self.isalive():
+            
+            # join the polling thread if it's alive
+            if self.pollrtpplay and self.pollrtpplay.is_alive():
+                self.pollrtpplay.kill = True
+                self.pollrtpplay.join()
+            
             self.proc.terminate()
         
     def begin_playback(self):
@@ -130,22 +152,18 @@ class RTPPlay(RTPTools):
         'True' if this is the case, and 'False' if nothing has been played
         yet or the file can't be found.
         """
-
-        return self.pollrtpplay.is_alive() and self.pollrtpplay.armed
+        
+        # must exist, be running, and be armed
+        return (self.pollrtpplay and
+                self.pollrtpplay.is_alive() and
+                self.pollrtpplay.armed)
     
 class RTPDump(RTPTools):
     """
     Dumps an RTP stream to a file.
     """
     
-    # TODO:
-    # - allow user to append to existing file
-    # - backup files
-    # - what happens if a rtpdump is already running?
-    #   - kill it.
-    #   - what about the existing file? TODO.
-
-    def __init__(self, path='rtpdump'):
+    def __init__(self, path="rtpdump"):
         RTPTools.__init__(self)
         
         # path to 'rtpdump' binary
@@ -185,8 +203,7 @@ class PollRTPPlay(threading.Thread):
 
     def run(self):
         while not self.kill:
-            time.sleep(0.1)
+            time.sleep(0.001)
             line = self.pipe.read()
             if line.find(self.armed_text) >= 0:
                 self.armed = True
-

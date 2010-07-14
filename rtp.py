@@ -187,6 +187,6 @@ class PollRTPPlay(threading.Thread):
         while not self.kill:
             time.sleep(0.1)
             line = self.pipe.read()
-            if line.find(self.armed_text) >= 0:
+            if self.armed_text in line:
                 self.armed = True
 

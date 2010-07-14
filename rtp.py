@@ -25,8 +25,12 @@ class RTPTools:
         """
         
         if self.isalive():
-            self.proc.terminate()
-
+            # this throws a harmless error if things happen out of sequence
+            try:
+                self.proc.terminate()
+            except OSError, e:
+                print e
+    
     def pid(self):
         """
         Returns the process identifier of the process started by 'start'.
@@ -100,7 +104,7 @@ class RTPPlay(RTPTools):
                 # only start the polling thread if verbose output is enabled,
                 # since we can't determine the status without it.
                 if verbose:
-                    self.start_poll(self.proc.stdout)
+                    self.start_poll(self.proc)
                 
         return self.pid()
     
@@ -117,7 +121,7 @@ class RTPPlay(RTPTools):
             self.pollrtpplay.join()
         
         # make the new thread
-        self.pollrtpplay = PollRTPPlay(stdout_pipe)
+        self.pollrtpplay = PollRTPPlay(self.proc)
         self.pollrtpplay.start()
 
     def stop(self):
@@ -133,7 +137,11 @@ class RTPPlay(RTPTools):
                 self.pollrtpplay.kill = True
                 self.pollrtpplay.join()
             
-            self.proc.terminate()
+            # catch a harmless error
+            try:
+                self.proc.terminate()
+            except OSError, e:
+                print e
         
     def begin_playback(self):
         """
@@ -144,7 +152,10 @@ class RTPPlay(RTPTools):
         
         # send a newline to tell the process to start as soon as it can
         if self.isalive():
-            self.proc.stdin.write("\n")
+            try:
+                self.proc.communicate("\n")
+            except ValueError, e:
+                print e
     
     def is_armed(self):
         """
@@ -192,18 +203,46 @@ class RTPDump(RTPTools):
         return self.pid()
 
 class PollRTPPlay(threading.Thread):
-    def __init__(self, stdout_pipe,
-            armed_text = "Press enter to begin playback."):
+    """
+    Polls the rtpplay process, searching for the text that indicates that
+    it has finished arming and flagging a variable when that happens.
+    """
+    
+    def __init__(self, proc, armed_text = "Press enter to begin playback."):
+        
         threading.Thread.__init__(self)
+        
+        # whether the armed text has been found in the output yet
         self.armed = False
-        self.pipe = stdout_pipe
-        self.armed_text = armed_text
+        
+        # whether the run method should terminate
         self.kill = False
+        
+        self.proc = proc
+        self.armed_text = armed_text
+        
         self.daemon = True
-
+    
     def run(self):
+        """
+        Read output from the process, looking for the text we want.
+        """
+        
         while not self.kill:
-            time.sleep(0.001)
-            line = self.pipe.read()
-            if self.armed_text in line:
+            # if we can't read, process died underneath us and we exit
+            try:
+                stdout, stderr = self.proc.communicate()
+            except ValueError, e:
+                break
+            
+            # since either can be 'None', we must check each before building
+            output_text = ""
+            if stdout:
+                output_text += stdout
+            if stderr:
+                output_text += stderr
+            
+            if self.armed_text in output_text:
                 self.armed = True
+            
+            time.sleep(0.001)

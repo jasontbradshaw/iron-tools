@@ -20,7 +20,7 @@ log = logging.getLogger("receiver")
 glob = util.ThreadedDataStore()
 
 # config variables
-RTPPLAY_ADDRESS = "10.98.0.81"
+RTPPLAY_ADDRESS = "127.0.0.1"#"10.98.0.81"
 RTPPLAY_PORT = 5008
 
 # directories synced from server

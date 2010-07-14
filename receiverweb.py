@@ -205,11 +205,13 @@ def get_status():
     """
     
     log.debug("called /get_status")
-
+    
     with glob:
         retfile = None
         if "armed_file" in glob and glob["armed_file"] is not None:
-            retfile = glob["armed_file"]
+            # only set the armed file if it is done being armed
+            if rtpplay.is_armed():
+                retfile = glob["armed_file"]
             
         playing = False
         if "is_playing" in glob and glob["is_playing"] is not None:

@@ -58,6 +58,7 @@ class RTPPlay(RTPTools):
         self.proc_start_time = None
         
         # the file where the armed status should exist
+        armed_dir = os.path.join(os.path.dirname(path), armed_file_name)
         self.armed_file = os.path.join(os.path.dirname(self.path),
                                        armed_dir, armed_file_name)
         
@@ -137,7 +138,7 @@ class RTPPlay(RTPTools):
         # the file exists and its modification time is after the start time
         # NOTE: any time is greater than or equal to 'None'
         return (os.path.exists(self.armed_file) and
-                os.path.getmtime(self.armed_file) >= self.proc_start_time):
+                os.path.getmtime(self.armed_file) >= self.proc_start_time)
     
 class RTPDump(RTPTools):
     """

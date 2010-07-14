@@ -53,6 +53,8 @@ class RTPPlay(RTPTools):
         # path to 'rtpplay' binary
         self.path = path
         self.proc = None
+
+        self.pollrtpplay = None
         
     def start(self, inputfile, address, port, start_time=None, end_time=None,
               wait_start=False):
@@ -89,14 +91,14 @@ class RTPPlay(RTPTools):
         
                 # TODO: close devnull?
                 DEVNULL = open(os.devnull, 'w')
-                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL,
+                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=sp.PIPE,
                                      stdin=sp.PIPE)
                 self.start_poll(self.proc.stdout) 
                 
         return self.pid()
     
     def start_poll(self, stdoutpipe):
-        if self.pollrtpplay.is_alive():
+        if self.pollrtpplay and self.pollrtpplay.is_alive():
             self.pollrtpplay.kill = True
             self.pollrtpplay.join()
         self.pollrtpplay = PollRTPPlay(stdoutpipe)
@@ -174,6 +176,7 @@ class RTPDump(RTPTools):
 class PollRTPPlay(threading.Thread):
     def __init__(self, stdout_pipe,
             armed_text = "Press enter to begin playback."):
+        threading.Thread.__init__(self)
         self.armed = False
         self.pipe = stdout_pipe
         self.armed_text = armed_text
@@ -184,6 +187,6 @@ class PollRTPPlay(threading.Thread):
         while not self.kill:
             time.sleep(0.1)
             line = self.pipe.read()
-            if line.contains(self.armed_text):
+            if line.find(self.armed_text) >= 0:
                 self.armed = True
 

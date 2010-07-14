@@ -141,7 +141,8 @@ class RTPPlay(RTPTools):
             try:
                 self.proc.terminate()
             except OSError, e:
-                print e
+                # process died underneath us, no big deal
+                pass
         
     def begin_playback(self):
         """
@@ -155,7 +156,8 @@ class RTPPlay(RTPTools):
             try:
                 self.proc.communicate("\n")
             except ValueError, e:
-                print e
+                # process died underneath us, so no big deal
+                pass
     
     def is_armed(self):
         """

@@ -166,7 +166,8 @@ def arm(file_name):
     rtpplay.start(path, RTPPLAY_ADDRESS, RTPPLAY_PORT, start_time=commit_time,
                   wait_start=True)
     
-    if not rtpplay.isalive():
+    # block for a bit until the process starts
+    if not util.block_until(rtpplay.isalive, 1):
         log.error("arm: rtpplay did not start correctly")
         return flask.jsonify(error="rtpplay did not start correctly.")
     

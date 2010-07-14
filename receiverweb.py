@@ -167,7 +167,7 @@ def arm(file_name):
                   wait_start=True)
     
     # block for a bit until the process starts
-    if not util.block_until(rtpplay.isalive, 1):
+    if not util.block_until(rtpplay.isalive, 3):
         log.error("arm: rtpplay did not start correctly")
         return flask.jsonify(error="rtpplay did not start correctly.")
     

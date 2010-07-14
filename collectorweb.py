@@ -119,7 +119,7 @@ def start_record():
             glob["dump_file"] = dump_file
         
         # give rtpdump a chance to start, and return an error if it didn't
-        if not util.block_until(rtpdump.isalive, 1):
+        if not util.block_until(rtpdump.isalive, 3):
             raise Exception("Failed to start rtpdump.")
         
     except Exception as e:
@@ -239,7 +239,7 @@ def play_preview(start_time, duration=30):
             end_time=start_time + duration)
     
     # wait until it starts, or fails to start
-    if not util.block_until(rtpplay.isalive, 1):
+    if not util.block_until(rtpplay.isalive, 3):
         log.error("play_preview: rtpplay did not start correctly.")
         return flask.jsonify(error="rtpplay is not alive")
     

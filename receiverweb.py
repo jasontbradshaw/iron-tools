@@ -210,12 +210,11 @@ def get_status():
     with glob:
         retfile = None
         if "armed_file" in glob and glob["armed_file"] is not None:
-            # only set the armed file if it is done being armed
-            if rtpplay.is_armed():
-                retfile = glob["armed_file"]
+            retfile = glob["armed_file"]
             
         playing = False
-        if "is_playing" in glob and glob["is_playing"] is not None:
+        if ("is_playing" in glob and glob["is_playing"] is not None and
+            rtpplay.isalive()):
             playing = glob["is_playing"]
     
     return flask.jsonify(file=retfile, is_playing=playing)

@@ -1,7 +1,16 @@
 *.pyc
 *~
 *.o
+*.dump
+*.tsdump
 *.log
+sync/
 clean.sh
 rtpdump
 rtpplay
+rtpsend
+rtptrans
+tags
+Makefile
+.deps
+config.status

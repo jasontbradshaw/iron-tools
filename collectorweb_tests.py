@@ -95,7 +95,7 @@ class CollectorWebTests(unittest.TestCase):
     def test08_play_preview_param(self):
         self.app.get('/start_record')
 
-        rv = self.app.get('/play_preview/0')
+        rv = self.app.get('/play_preview/1')
         assert '{}' in rv.data
 
         time.sleep(10)

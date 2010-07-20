@@ -32,9 +32,6 @@ class CollectorWebTests(unittest.TestCase):
 
         rv = self.app.get('/start_record')
         js = json.loads(rv.data)
-        print js 
-        for x in js:
-            print x + "   " + js[x]
         assert js['warning'] == "rtpdump already running."
 
     #asserts the time is being tracked properly

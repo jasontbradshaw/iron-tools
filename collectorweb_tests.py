@@ -2,6 +2,7 @@ import collectorweb
 import unittest
 import json
 import time
+import gc
 
 class CollectorWebTests(unittest.TestCase):
 
@@ -9,8 +10,9 @@ class CollectorWebTests(unittest.TestCase):
         self.app = collectorweb.app.test_client()
 
     def tearDown(self):
-        del self.app
-        
+        # kill orphaned processes
+        collectorweb.rtpdump.stop()
+        collectorweb.rtpplay.stop()
 
     #asserts starting conditions are correct
     def test03_root(self):

@@ -9,6 +9,9 @@ class ReceiverWebTests(unittest.TestCase):
     def setUp(self):
         self.app = receiverweb.app.test_client()
 
+    def tearDown(self):
+        receiverweb.rtpplay.stop()
+
     def test1_home(self):
         rv = self.app.get('/')
         assert '/static/receiver/index.html' in rv.data

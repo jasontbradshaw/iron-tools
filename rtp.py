@@ -14,8 +14,8 @@ class RTPTools:
         poll status.
         """
         
-        return self.proc and self.proc.poll() is None
-
+        return self.proc is not None and self.proc.poll() is None
+    
     def start(self):
         raise NotImplementedError("'start' method not implemented")
 

@@ -93,7 +93,7 @@ class CollectorWebTests(unittest.TestCase):
     #assert play preview funtions properly with nzp values
     def test0H_play_preview_param(self):
         self.app.get('/start_record')
-
+        
         rv = self.app.get('/play_preview/10')
         assert '{}' in rv.data
 

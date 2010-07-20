@@ -87,10 +87,7 @@ class RTPPlay(RTPTools):
                 # add address/port string
                 args.extend(["%s/%d" % (address, port)])
         
-                # TODO: close devnull?
-                DEVNULL = open(os.devnull, 'w')
-                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=sp.PIPE,
-                                     stdin=sp.PIPE)
+                self.proc = sp.Popen(args, stdin=sp.PIPE)
             
         return self.pid()
     
@@ -141,8 +138,6 @@ class RTPDump(RTPTools):
                         "-o", outputfile,
                         "%s/%d" % (address, port)]
                 
-                # TODO: close devnull?
-                DEVNULL = open(os.devnull, 'w')
-                self.proc = sp.Popen(args, stderr=DEVNULL, stdout=DEVNULL)
+                self.proc = sp.Popen(args)
         
         return self.pid()

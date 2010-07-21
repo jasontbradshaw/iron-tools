@@ -14,7 +14,8 @@ rtpplay = rtp.RTPPlay()
 
 # set up logging
 RECEIVER_LOG_FILENAME = "receiver.log"
-logging.basicConfig(filename=RECEIVER_LOG_FILENAME, level=logging.NOTSET)
+logging.basicConfig(filename=RECEIVER_LOG_FILENAME, level=logging.NOTSET,
+                    format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
 log = logging.getLogger("receiver")
 
 glob = util.ThreadedDataStore()

@@ -20,14 +20,17 @@ class ReceiverWebTests(unittest.TestCase):
         receiverweb.rtpplay.stop()
         
         # replace data store with a new one (clears all state)
-        recieverweb.glob = util.ThreadedDataStore()
+        receiverweb.glob = util.ThreadedDataStore()
     
-    def test1_home(self):
+    def test_home(self):
         rv = self.app.get('/')
         assert '/static/receiver/index.html' in rv.data
 
-    # assert that stop does nothing if nothing is playing
-    def test2_stop(self):
+    def test_stop(self):
+        """
+        Make sure stop does nothing if nothing is playing.
+        """
+        
         rv = self.app.get('/stop')
         assert '{}' in rv.data
         
@@ -36,19 +39,29 @@ class ReceiverWebTests(unittest.TestCase):
         assert js2['file'] == None
         assert js2['is_playing'] == False
 
-    # assert that get_file_list returns a 'file_list'
-    def test3_get_file_list(self):
+    def test_get_file_list(self):
+        """
+        Make sure getting a file list gives us a file list.
+        """
+        
         rv = self.app.get('/get_file_list')
         js = json.loads(rv.data)
         assert 'file_list' in js
 
-    # asserts that trying to load a fake commit time returns None
-    def test4_commit_time(self):
+    def test_commit_time(self):
+        """
+        Loading a 'fake' commit time returns 'None'.
+        """
+        
         result = receiverweb.load_commit_time('fake_test')
         assert result == None
 
-    # asserts that fake_test.dump did not exist and proper error was returned
-    def test5_arm(self):
+    def test_arm(self):
+        """
+        Asserts that fake_test.dump did not exist and proper error was
+        returned.
+        """
+        
         rv = self.app.get('/arm/fake_test.dump')
         js = json.loads(rv.data)
         assert js['error'] == "could not find file 'fake_test.dump'."
@@ -58,8 +71,11 @@ class ReceiverWebTests(unittest.TestCase):
         assert js2['file'] == None
         assert js2['is_playing'] == False
  
-    # asserts that play does not break when there is nothing to play
-    def test6_play(self):
+    def test_play(self):
+        """
+        Asserts that play does not break when there is nothing to play.
+        """
+        
         rv = self.app.get('/play')
         js = json.loads(rv.data)
         assert js['warning'] == 'rtpplay is not alive, no signal sent.'
@@ -69,15 +85,21 @@ class ReceiverWebTests(unittest.TestCase):
         assert js2['file'] == None
         assert js2['is_playing'] == False
 
-    # asserts that get_status returns False when nothing is playing
-    def test7_get_status(self):
+    def test_get_status(self):
+        """
+        Asserts that get_status returns False when nothing is playing.
+        """
+        
         rv = self.app.get('/get_status')
         js = json.loads(rv.data)
         assert js['file'] == None
         assert js['is_playing'] == False
 
-    # assert the status remains unchanged after play and stop
-    def test8_play(self):
+    def test_play(self):
+        """
+        Assert the status remains unchanged after play and stop.
+        """
+        
         rv = self.app.get('/play')
         js = json.loads(rv.data)
 

@@ -22,21 +22,31 @@ class CollectorWebTests(unittest.TestCase):
         
         # replace data store with a new one (clears all state)
         collectorweb.glob = util.ThreadedDataStore()
-        
-    #asserts starting conditions are correct
+    
     def test_root(self):
+        """
+        Asserts starting conditions are correct.
+        """
+        
         rv = self.app.get('/')
         assert '/static/collector/index.html' in rv.data
         
     def test_stop(self):
+        """
+        See if stopping a playback had the desired effects.
+        """
+        
         rv = self.app.get('/stop_record')
         js = json.loads(rv.data)
         assert js['seconds_elapsed'] == 0
         assert js['committed_time'] == 0
         assert js['is_recording'] == False   
     
-    #assert start record prevents double starting
     def test_record(self):
+        """
+        Try to start something twice.
+        """
+        
         rv = self.app.get('/start_record')
         assert '{}' in rv.data
 
@@ -44,8 +54,11 @@ class CollectorWebTests(unittest.TestCase):
         js = json.loads(rv.data)
         assert js['warning'] == "rtpdump already running."
 
-    #asserts the time is being tracked properly
     def test_elapsed_time(self):
+        """
+        Make sure elapsed time is being tracked properly.
+        """
+        
         rv = self.app.get('/get_record_status')
         js = json.loads(rv.data)
         assert js['seconds_elapsed'] == 0
@@ -67,11 +80,20 @@ class CollectorWebTests(unittest.TestCase):
         assert 3 <= t2 - t1 <= 4    # close enough
     
     def test_commit_nostart(self):
+        """
+        Make sure we can't commit a time until at least one recordin has
+        been started.
+        """
+        
         rv = self.app.get('/commit_time/0')
         js = json.loads(rv.data)
         assert "error" in js
     
     def test_commit_basic(self):
+        """
+        Does committing a time work?
+        """
+        
         self.app.get("/start_record")
         self.app.get("/stop_record")
         
@@ -88,15 +110,21 @@ class CollectorWebTests(unittest.TestCase):
         assert 'committed_time' in js
         assert int(js['committed_time']) == 98765
         
-    #assert play preview funtions properly with nzp values
     def test_play_preview_initial(self):
+        """
+        Try various NZP commit time values.
+        """
+        
         rv = self.app.get('/play_preview/30')
         js = json.loads(rv.data)
         assert 'error' in js
         assert js['error'] == "no recording started, unable to preview."
 
-    #assert play preview funtions properly with nzp values
     def test_play_preview_param(self):
+        """
+        Does playing a preview with any parameter work?
+        """
+        
         self.app.get('/start_record')
 
         rv = self.app.get('/play_preview/1')

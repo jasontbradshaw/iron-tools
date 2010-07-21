@@ -91,16 +91,13 @@ class CollectorWebTests(unittest.TestCase):
 
 
     #assert play preview funtions properly with nzp values
-    def test08_play_preview_param(self):
+    def test08_stop_end_status(self):
         self.app.get('/start_record')
-
-        rv = self.app.get('/play_preview/1')
-        assert '{}' in rv.data
-
-        time.sleep(10)
-
-        rv = self.app.get('/play_preview/10/10')
-        assert '{}' in rv.data
+        time.sleep(3)
+        rv = self.app.get('/stop_record')
+        js = json.loads(rv.data)
+        
+        
     
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTests)

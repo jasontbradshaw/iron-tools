@@ -10,8 +10,18 @@ class ReceiverWebTests(unittest.TestCase):
         self.app = receiverweb.app.test_client()
 
     def tearDown(self):
+        """
+        We have to basically manually reset state of the app here.  For
+        whatever reason, it persists between tests, and to ensure we get
+        a blank slate for every test, we have to wipe it ourselves.
+        """
+        
+        # kill rtp* processes
         receiverweb.rtpplay.stop()
-
+        
+        # replace data store with a new one (clears all state)
+        recieverweb.glob = util.ThreadedDataStore()
+    
     def test1_home(self):
         rv = self.app.get('/')
         assert '/static/receiver/index.html' in rv.data

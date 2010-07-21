@@ -14,7 +14,8 @@ app = Flask(__name__)
 
 # set up logging
 COLLECTOR_LOG_FILENAME = "collector.log"
-logging.basicConfig(filename=COLLECTOR_LOG_FILENAME, level=logging.NOTSET)
+logging.basicConfig(filename=COLLECTOR_LOG_FILENAME, level=logging.NOTSET,
+                    format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
 log = logging.getLogger("collector")
 
 # always access the datastore's contents with a 'with' statement!

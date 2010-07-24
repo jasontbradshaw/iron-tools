@@ -17,43 +17,6 @@ class NoRecordedFileError(Exception):
     """Indicates an attempt to commit a time without a previous recording."""
     pass
 
-class RecorderState:
-    """
-    Object used to initialize and store state variables for Recorder.
-    """
-    
-    def __init__(self):
-        """
-        Initializes the state variables to their default vaules.
-        """
-        
-        # most recently committed time, applies to most recent dump file
-        self.__commit_time = None
-        
-        # unix time recording was started
-        self.__start_time = None
-        
-        # file most recently dumped to
-        self.__dump_file = None
-    
-    def set_commit_time(self, t):
-        self.__commit_time = t
-    
-    def get_commit_time(self):
-        return self.__commit_time
-    
-    def set_start_time(self, t):
-        self.__start_time = t
-    
-    def get_start_time(self):
-        return self.__start_time
-    
-    def set_dump_file(self, f):
-        self.__dump_file = f
-    
-    def get_dump_file(self):
-        return self.__dump_file
-    
 class Recorder:
     """
     Manages processes and state for playing and recording RTP streams.
@@ -98,6 +61,11 @@ class Recorder:
         
         # make sure critical operations are atomic
         self.__lock = threading.Lock()
+        
+        # state variables
+        self.commit_time = None
+        self.start_time = None
+        self.dump_file = None
     
     def _create_dirs(self):
         """
@@ -128,8 +96,7 @@ class Recorder:
     
     def start_record(self):
         """
-        Begins dumping the configured stream to disk.  Raises an exception
-        if the process fails for any reason.
+        Begins dumping the configured stream to disk.
         """
         
         with self.__lock:
@@ -137,22 +104,22 @@ class Recorder:
             if self.rtpdump.isalive():
                 msg = "rtpdump process was already running"
                 raise ProcessAlreadyRunningError(msg)
-        
+            
             # name of the file we're dumping to
             dump_file = os.path.join(self.dump_dir,
                             util.generate_file_name(self.video_basename))
-        
+            
             # start the process
             rtpdump.start(dump_file, self.dump_address, self.dump_port)
-        
+            
             if not util.block_until(self.rtpdump.isalive, self.max_block_time):
                 msg = "rtpdump process failed to start within allotted time"
                 raise ProcessOperationTimeoutError(msg)
-        
+            
             # set state variables to correspond to new file if process started
-            self.state.set_commit_time(None)
-            self.state.set_start_time(util.get_time())
-            self.state.set_dump_file(dump_file)
+            self.commit_time = None
+            self.start_time = util.get_time()
+            self.dump_file = dump_file
     
     def stop_record(self):
         """
@@ -164,17 +131,17 @@ class Recorder:
         with self.__lock:
             # tell the process to exit
             self.rtpdump.stop()
-        
+            
             # wait until it does, or throw an error if it doesn't
             if not util.block_while(rtpdump.isalive, self.max_block_time):
                 msg = "rtpdump process failed to end within the allotted time"
                 raise ProcessOperationTimeoutError(msg)
-        
+            
             # retrieve the final status before resetting it
             final_status = self.get_status()
-        
+            
             # since we ended the process, we reset the start time
-            self.state.set_start_time(None)
+            self.start_time = None
         
         return final_status
     
@@ -185,33 +152,34 @@ class Recorder:
         rtpdump process is currently recording.
         """
         
-        commit_time = self.state.get_commit_time()
-        elapsed_time = util.get_time() - self.state.get_start_time()
+        elapsed_time = None
+        if self.start_time is not None:
+            elapsed_time = util.get_time() - self.start_time
+        
         is_recording = self.rtpdump.isalive()
         
         # we ensure the types of all this outgoing data
-        return commit_time, elapsed_time, is_recording
+        return self.commit_time, elapsed_time, is_recording
     
     def commit_time(self, t):
         """
         Sets the commit time of the currently recording file, if there is
-        one.  Raises an exception otherwise.
+        one.
         """
-    
+        
         with self.__lock:
             # prevent setting a commit time if no file has been dumped yet
-            if self.state.get_commit_time() is None:
+            if self.commit_time is None:
                 msg = ("commit time can only be set if at least one file"
                        "has been recorded this session")
                 raise NoRecordedFileError(msg)
-        
+            
             # set the actual commit time
-            self.state.set_commit_time(t)
-        
+            self.commit_time = t
+            
             # get the base name of the dump file and write a commit file for it
-            base_dump_filename = os.path.basename(self.state.get_dump_file())
-            self._write_commit_file(base_dump_filename,
-                                    self.state.get_commit_time())
+            base_dump_filename = os.path.basename(self.dump_file)
+            self._write_commit_file(base_dump_filename, self.commit_time)
     
     def play_preview(self, start_time, duration=30):
         """
@@ -221,27 +189,28 @@ class Recorder:
         
         with self.__lock:
             # make sure something has been recorded before previewing
-            if self.state.get_dump_file() is None:
+            if self.dump_file is None:
                 msg = "a recording must have been started to enable preview"
                 raise NoRecordedFileError(msg)
-        
+            
             # ensure the file we are trying to play exists already
-            if not os.path.exists(self.state.get_dump_file()):
+            if not os.path.exists(self.dump_file):
                 msg = ("could not find dump file '%s' for preview" %
-                       self.state.get_dump_file())
+                       self.dump_file)
                 raise IOError(msg)
-        
+            
             # end the current preview before starting another one
             rtpplay.stop()
+            
             if not util.block_while(rtpplay.isalive, self.max_block_time):
                 msg = "failed to terminate previously running rtpplay process"
                 raise ProcessOperationTimeoutError(msg)
-        
+            
             # attempt to play the given file
-            rtpplay.start(self.state.get_dump_file(), self.preview_address,
+            rtpplay.start(self.dump_file, self.preview_address,
                           self.preview_port, start_time=start_time,
                           end_time=start_time + duration)
-        
+            
             # wait until the process starts
             if not util.block_until(rtpplay.isalive, self.max_block_time):
                 msg = "rtpplay failed to start or exited very quickly"

@@ -22,14 +22,11 @@ class Recorder:
     Manages processes and state for playing and recording RTP streams.
     """
     
-    def __init__(self, logger):
+    def __init__(self):
         
         # process managing classes
         self.rtpplay = rtp.RTPPlay()
         self.rtpdump = rtp.RTPDump()
-        
-        # user-provided logger
-        self.logger = logger
         
         # rtpdump parameters
         self.dump_address = "0.0.0.0"
@@ -52,9 +49,6 @@ class Recorder:
         
         # maximum time we will wait for a process to complete an action
         self.max_block_time = 3
-        
-        # state class that keeps track of all the variables we need
-        self.state = RecorderState()
         
         # make sure we have the directory structure we'll need
         self._create_dirs()

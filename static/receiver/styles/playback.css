@@ -1,1 +1,61 @@
-﻿
+﻿.videoList
+{
+	border: 2px inset;
+	width:100%;
+	height:150px;
+	overflow:auto;
+}
+
+.panelBody
+{
+	width:100%;
+}
+
+.panel
+{
+	width:400px;
+	padding:4px;
+}
+
+.videoItem
+{
+	border:1px dotted silver;
+	/*background-color:Black;*/
+	
+}
+
+.filename
+{
+	font-weight:bold;
+}
+
+.startTime, .fileSize
+{
+	font-style:italic;
+	font-size:8pt;
+	padding-left:10px;
+}
+
+.startTimeMissing
+{
+	color:Red;
+}
+
+.selected
+{
+	background-color: Gray;
+	color: White;
+}
+
+.loaded
+{
+	background-color:Blue;
+	color:White;
+}
+
+.highlight
+{
+	background-color:silver;
+	color:Black;
+}
+

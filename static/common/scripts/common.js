@@ -70,14 +70,14 @@ function getJSON(url, params, isAsync, successCallback, errorCallback)
     return $.ajax({
         type: "GET",
         url: url,
-        success: successCallback,
+        success: function (data) { OnComplete(data, successCallback); },
         error: errorCallback,
         dataType: "json",
         async: isAsync
     });
 }
 
-function displayStatusMessage(message, isError)
+function displayStatusMessage(message, isError, leaveOnScreen)
 {
     var statusPanel = $("#statusPanel");
     statusPanel.text(message);
@@ -98,11 +98,51 @@ function displayStatusMessage(message, isError)
         statusPanel.removeClass("statusError");
     }
 
-    statusPanel.fadeIn(2000, hideStatusMessage);
+    var callback;
+
+    if (!leaveOnScreen)
+    {
+        callback = hideStatusMessage;
+    }
+
+    statusPanel.fadeIn(2000, callback);
     //window.setTimeout(function () { alert(message); }, 500);
 }
 
 function hideStatusMessage()
 {
     $("#statusPanel").fadeOut(2000, function () { $("#statusPanel").text(""); });
+}
+function OnComplete(data, callback)
+{
+    try
+    {
+        callback(data);
+    }
+    catch (e)
+    {
+        var message;
+        if (e.description)
+        {
+            message = e.description;
+        }
+        else
+        {
+            message = e;
+        }
+        
+        displayStatusMessage("Error:" + message, true, true);
+    }
+}
+
+function addOption(list, option)
+{
+    try
+    {
+        list.add(option, null);
+    }
+    catch (e)
+    {
+        list.add(option);
+    }
 }

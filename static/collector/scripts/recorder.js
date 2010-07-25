@@ -144,10 +144,17 @@ function checkStatus(onCompleteCallback)
 
 function checkStatusOnComplete(data, callback)
 {
-    handleResult(data);
-    if (callback != null && typeof (callback) == "function")
+    if (String.isNullOrEmpty(data.error))
     {
-        callback();
+        handleResult(data);
+        if (callback != null && typeof (callback) == "function")
+        {
+            callback();
+        }
+    }
+    else
+    {
+        displayStatusMessage("Unable to retrieve record status from server: " + errorThrown, true);
     }
 }
 

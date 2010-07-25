@@ -1,38 +1,44 @@
 ﻿<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Live Stream Playback</title>
-    <script type="text/javascript" src="../common/scripts/common.js"></script>
-    <script type="text/javascript" src="../common/scripts/jquery-1.4.1.js"></script>
-    <script type="text/javascript" src="scripts/playback.js"></script>
-    <link rel="Stylesheet" type="text/css" href="../common/styles/common.css" />
-    <link type="text/css" rel="Stylesheet" href="styles/playback.css" />
+	<title>Live Stream Playback</title>
+	<script type="text/javascript" src="../common/scripts/common.js"></script>
+	<script type="text/javascript" src="../common/scripts/jquery-1.4.1.js"></script>
+	<script type="text/javascript" src="scripts/playback.js"></script>
+	<link rel="Stylesheet" type="text/css" href="../common/styles/common.css" />
+	<link type="text/css" rel="Stylesheet" href="styles/playback.css" />
 </head>
-<body style="display:none;">
-    <div id="statusPanel" class="status" style="display: none">
-    </div>
-    <div id="playbackPanel" class="panel">
-        <p class="panelTitle">
-            Play Video</p>
-      <div class="panelBody">
-              <select id="videoList" onchange="videoListOnChange()"></select>
-            <div id="buttonPanel" class="buttonPanel">
-                <img id="load" alt="Load Video" class="button" src="../common/images/white/load.png" normalsrc="../common/images/white/load.png"
-                    onmouseoversrc="../common/images/blue/load.png" onmousedownsrc="../common/images/red/load.png" disabledsrc="../common/images/black/load.png"
-                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                    onclick="loadVideo(this)" />
-                <img id="play" alt="Play Video" class="button" src="../common/images/white/play.png" normalsrc="../common/images/white/play.png"
-                    onmouseoversrc="../common/images/blue/play.png" onmousedownsrc="../common/images/red/play.png" disabledsrc="../common/images/black/play.png"
-                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                    onclick="playVideo(this)" />
-                <img id="stop" alt="Stop Video" class="button" src="../common/images/white/stop.png" normalsrc="../common/images/white/stop.png"
-                    onmouseoversrc="../common/images/blue/stop.png" onmousedownsrc="../common/images/red/stop.png" disabledsrc="../common/images/black/stop.png"
-                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                    onclick="stopVideo(this)" />
-            </div>
-        </div>
-    </div>
-    <script type="text/javascript">
-        getFileList(function () { $("body").fadeIn(1000); });
-    </script>
+<body>
+	<div id="statusPanel" class="status" style="display: none">
+	</div>
+	<div id="bodyPanel" style="display: none;">
+		<div id="playbackPanel" class="panel">
+			<p class="panelTitle">
+				Play Video</p>
+			<div class="panelBody">
+				<div id="videoListContainer" class="videoList">
+				</div>
+				<div id="buttonPanel" class="buttonPanel">
+					<!--                   <img id="load" title="Load Video" class="button" src="../common/images/blue/load.png"
+                        normalsrc="../common/images/blue/load.png" onmouseoversrc="../common/images/blue-hot/load.png"
+                        onmousedownsrc="../common/images/red/load.png" disabledsrc="../common/images/white/load.png"
+                        onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                        onclick="loadVideo(this)" />-->
+					<img id="play" title="Play Video" class="button" src="../common/images/blue/play.png"
+						normalsrc="../common/images/blue/play.png" onmouseoversrc="../common/images/blue-hot/play.png"
+						onmousedownsrc="../common/images/red/play.png" disabledsrc="../common/images/white/play.png"
+						onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+						onclick="playVideo(this)" />
+					<img id="stop" title="Stop Video" class="button" src="../common/images/blue/stop.png"
+						normalsrc="../common/images/blue/stop.png" onmouseoversrc="../common/images/blue-hot/stop.png"
+						onmousedownsrc="../common/images/red/stop.png" disabledsrc="../common/images/white/stop.png"
+						onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+						onclick="stopVideo(this)" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		initialize();
+	</script>
 </body>
 </html>

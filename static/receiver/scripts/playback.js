@@ -1,203 +1,421 @@
-﻿function hideButton(buttonId)
+﻿var sortedResult;
+
+function createElement(tag, id, className, value)
 {
-//    var button = $("#" + buttonId);
-//    button.addClass("hidden");
-    //    button.removeClass("visible");
-    disableButton(buttonId);
+	var element = $("<" + tag + "/>");
+
+	if (!String.isNullOrEmpty(id))
+	{
+		element.attr("id", id);
+	}
+
+	element.addClass(className);
+
+	if (!String.isNullOrEmpty(value))
+	{
+		element.text(value);
+	}
+	return element;
 }
 
-function showButton(buttonId)
+function getStartTimeMessage(startTime)
 {
-//    var button = $("#" + buttonId);
-//    button.addClass("visible");
-    //    button.removeClass("hidden");
-    enableButton(buttonId);
+	var startTimeMessage = startTime ? "Receieved" : "Not Received";
+	return "Start Time: " + startTimeMessage;
 }
 
-var sortedResult;
+function getFileSizeMessage(fileSize)
+{
+	return "File Size: " + getFileSize(fileSize) + " MB";
+}
+
+function createListItem(filename)
+{
+	var element = createElement("div", getNormalizedFilename(filename), "videoItem");
+	element.hover(function () { element.addClass("highlight"); }, function () { element.removeClass("highlight"); });
+	element.mousedown(function ()
+	{
+		clearSelectedOptions();
+		clearLoadedOptions();
+		element.addClass("selected");
+	});
+	element.click(function () { loadVideo(element); });
+	return element;
+}
+
+function createOrUpdateListItem(item)
+{
+	var element = $("#" + getNormalizedFilename(item.filename));
+
+	if (element.length == 0)
+	{
+		element = createListItem(item.filename);
+	}
+	else
+	{
+		$("*", element).remove();
+	}
+
+	element.append(createElement("div", null, "filename", item.filename));
+	var startTimeStyle = item.start_time_received ? "" : "startTimeMissing ";
+	startTimeStyle = startTimeStyle + "startTime";
+	element.append(createElement("div", null, startTimeStyle, getStartTimeMessage(item.start_time_received)));
+	element.append(createElement("div", null, "fileSize", getFileSizeMessage(item.file_size)));
+	return element;
+}
 
 function populateFileList(data)
 {
-    data.sort(fileSorter);
-    var list = $("#videoList")[0];
+	data.sort(fileSorter);
+	var list = $("#videoListContainer");
 
-    list.add(createOption("", ""));
+	//addOption(list, createOption("", ""));
+	list.text = "";
 
-    for (var i = 0; i < data.length; i++)
-    {
-        var startTime = (data[i].start_time_received ? "" : "no ") + "start time";
-        var option = createOption(data[i].filename, data[i].filename + " - " + startTime + " - " + getFileSize(data[i].file_size) + " MB");
-        list.add(option);
-    }
+	if (data.length == 0 && list.children().length == 0)
+	{
+		list.append(createElement("div", "filename", "filename", "No videos are available for playback"));
+	}
+	else
+	{
+		var i;
+		for (i = 0; i < data.length; i++)
+		{
+			list.prepend(createOrUpdateListItem(data[i]));
+			
+//			var option = addOrUpdateListItem(data[i].filename, data[i].start_time_received, fileSize);
+//			list.append(option);
 
-    sortedResult = data;
+			//var option = createOption(data[i].filename, data[i].filename + " - " + startTime + " - " + getFileSize(data[i].file_size) + " MB");
+			// addOption(list, option);
+		}
+
+		var index = i - 1;
+		$(".videoItem:gt(" + index + ")", list).remove();
+
+//		for (var j = list.children()..length - 1; j >= i; j--)
+//		{
+//			list.children().re
+//		}
+	}
+
+
+
+	//var junk = list.children().sort(listItemSorter);
+
+	sortedResult = data;
 }
 
 function createOption(value, text)
 {
-    var e = document.createElement("OPTION");
-    e.value = value;
-    e.text = text; 
-    return e;
+	var e = document.createElement("OPTION");
+	e.value = value;
+	e.text = text;
+	return e;
 }
 
 Math.roundTo = function (value, decimals)
 {
-    var factor = Math.pow(10, decimals);
-    return Math.round(value * factor) / factor;
+	var factor = Math.pow(10, decimals);
+	return Math.round(value * factor) / factor;
 }
-
 
 function getFileSize(bytes)
 {
-    return Math.roundTo(bytes / 1024 / 1024, 2);
-    //   return Math.round(bytes / 1024 / 1024 * 100)/100;
+	return Math.roundTo(bytes / 1024 / 1024, 2);
 }
 
 function fileSorter(fileA, fileB)
 {
-    if (fileA.filename < fileB.filename)
-    {
-        return 1;
-    }
-    else if (fileA.filename == fileB.filename)
-    {
-        return 0;
-    }
-    else
-    {
-        return -1;
-    }
+	if (fileA.filename > fileB.filename)
+	{
+		return 1;
+	}
+	else if (fileA.filename == fileB.filename)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
 }
+
+//function listItemSorter(item1, item2)
+//{
+//	var itemName1 = $(".filename",$(item1)).text();
+//	var itemName2 = $(".filename", $(item2)).text();
+
+//	if (itemName1 < itemName2)
+//	{
+//		return 1;
+//	}
+//	else if (itemName1 == itemName2)
+//	{
+//		return 0;
+//	}
+//	else
+//	{
+//		return -1;
+//	}
+//}
 
 function getFileList(callback)
 {
-    getJSON("../../get_file_list", null, true, function (data) { getFileListOnComplete(data, callback); }, getFileListOnError);
+	getJSON("../../get_file_list", null, true, function (data) { getFileListOnComplete(data, callback); }, getFileListOnError);
 }
+
 
 function getFileListOnComplete(data, callback)
 {
-    if (data.file_list.length > 0)
-    {
-        populateFileList(data.file_list);
-        videoListOnChange();
+	if (String.isNullOrEmpty(data.error))
+	{
+		populateFileList(data.file_list);
 
-        if (callback != null && typeof (callback) == "function")
-        {
-            callback();
-        }
-    }
-    else
-    {
-        //throw error
-    }
+		if ($(".selected|.loaded").length == 0)
+		{
+			videoListOnChange();
+		}
+
+		if (callback != null && typeof (callback) == "function")
+		{
+			callback();
+		}
+	}
+	else
+	{
+		displayStatusMessage("Unable to retrieve file list: " + data.error, true);
+	}
 }
 
 function videoListOnChange()
 {
-    showButton("load");
-    hideButton("play");
-    hideButton("stop");
+	//   enableButton("load");
+	disableButton("play");
+	disableButton("stop");
 }
 
-function getFileListOnError(xmlHttpRequest, status, errorThrown)
+function getFileListOnError(xmlHttpRequesget, status, errorThrown)
 {
-    
+	displayStatusMessage("Unable to retrieve file list: " + errorThrown, true);
 }
 
-function loadVideo(loadButton)
+function loadVideo(option)
 {
-    if (!loadButton.disabled)
-    {
-        var list = $("#videoList")[0];
-        var selectedOption = list.options[list.selectedIndex].value;
-        if (String.isNullOrEmpty(selectedOption))
-        {
-            alert("Please select a video to load");
-        }
-        else
-        {
-            var params = new Array();
-            params.push(selectedOption);
-            getJSON("../../arm", params, true, loadVideoOnComplete, loadVideoOnError);
-        }
-    }
+	//    if (!loadButton.disabled)
+	//    {
+	//var list = $("#videoList")[0];
+	var selectedOptionJs = $(".filename", option);
+	var selectedOption = selectedOptionJs.text();
+	//var selectedOption = list.options[list.selectedIndex].value;
+	if (String.isNullOrEmpty(selectedOption))
+	{
+		alert("Please select a video to load");
+	}
+	else
+	{
+		var params = new Array();
+		params.push(selectedOption);
+		getJSON("../../arm", params, true, loadVideoOnComplete, loadVideoOnError);
+	}
+	//    }
 }
 
 function loadVideoOnComplete(status)
 {
-    if (String.isNullOrEmpty(status.error))
-    {
-        hideButton("load");
-        showButton("play");
-        hideButton("stop");
-        displayStatusMessage("Video loaded successfully", false);
-    }
-    else
-    {
-        displayStatusMessage("Unable to load video: " + status.error, true);
-    }
+	if (String.isNullOrEmpty(status.error))
+	{
+		//disableButton("load");
+		disableButton("play");
+		disableButton("stop");
+		displayStatusMessage("Video is loading", false);
+	}
+	else
+	{
+		displayStatusMessage("Unable to load video: " + status.error, true);
+	}
 }
 
 function loadVideoOnError(xmlHttpRequest, status, errorThrown)
 {
-    displayStatusMessage("Unable to load video: " + errorThrown, true);
+	displayStatusMessage("Unable to load video: " + errorThrown, true);
 }
 
 function playVideo(playButton)
 {
-    if (!playButton.disabled)
-    {
-        getJSON("../../play", null, true, playVideoOnComplete, playVideoOnError);
-    }
+	if (!playButton.disabled)
+	{
+		getJSON("../../play", null, true, playVideoOnComplete, playVideoOnError);
+	}
 }
 
 function playVideoOnComplete(status)
 {
-    if (String.isNullOrEmpty(status.error))
-    {
-        hideButton("load");
-        hideButton("play");
-        showButton("stop");
-        $("#videoList")[0].disabled = true;
-        displayStatusMessage("Video playback started successfully", false);
-    }
-    else
-    {
-        displayStatusMessage("Unable to start video playback: " + status.error, true);
-    }
+	if (String.isNullOrEmpty(status.error))
+	{
+		//disableButton("load");
+		disableButton("play");
+		enableButton("stop");
+		//$("#videoList")[0].disabled = true;
+		displayStatusMessage("Video playback started successfully", false);
+	}
+	else
+	{
+		displayStatusMessage("Unable to start video playback: " + status.error, true);
+	}
 }
 
 function playVideoOnError(xmlHttpRequest, status, errorThrown)
 {
-    displayStatusMessage("Unable to start video playback: " + errorThrown, true);
+	displayStatusMessage("Unable to start video playback: " + errorThrown, true);
 }
 
 function stopVideo(stopButton)
 {
-    if (!stopButton.disabled)
-    {
-        getJSON("../../stop", null, true, stopVideoOnComplete, stopVideoOnError);
-    }
+	if (!stopButton.disabled)
+	{
+		getJSON("../../stop", null, true, stopVideoOnComplete, stopVideoOnError);
+	}
 }
 
 function stopVideoOnComplete(status)
 {
-    if (String.isNullOrEmpty(status.error))
-    {
-        showButton("load");
-        hideButton("play");
-        hideButton("stop");
-        $("#videoList")[0].disabled = false;
-        displayStatusMessage("Video playback stopped successfully", false);
-    }
-    else
-    {
-        displayStatusMessage("Unable to stop video playback: " + status.error, true);
-    }
+	if (String.isNullOrEmpty(status.error))
+	{
+		// enableButton("load");
+		disableButton("play");
+		disableButton("stop");
+		//$("#videoList")[0].disabled = false;
+		clearLoadedOptions();
+		displayStatusMessage("Video playback stopped successfully", false);
+	}
+	else
+	{
+		displayStatusMessage("Unable to stop video playback: " + status.error, true);
+	}
 }
 
 function stopVideoOnError(xmlHttpRequest, status, errorThrown)
 {
-    displayStatusMessage("Unable to stop video playback: " + errorThrown, true);
+	displayStatusMessage("Unable to stop video playback: " + errorThrown, true);
+}
+
+var g_statusId;
+
+function stopCheckingStatus()
+{
+	if (g_statusId)
+	{
+		window.clearInterval(g_statusId);
+	}
+}
+
+function beginCheckingStatus()
+{
+	stopCheckingStatus();
+	g_statusId = window.setInterval(getStatus, 1000);
+}
+
+var g_FileListId;
+
+function stopCheckingFileList()
+{
+	if (g_FileListId)
+	{
+		window.clearInterval(g_FileListId);
+	}
+}
+
+function beginCheckingFileList()
+{
+	stopCheckingStatus();
+	g_FileListId = window.setInterval(getFileList, 10000);
+}
+
+function getStatus(callback)
+{
+	getJSON("../../get_status", null, true, function (data) { getStatusOnComplete(data, callback); }, getStatusOnError);
+}
+
+function getStatusOnComplete(status, callback)
+{
+	if (String.isNullOrEmpty(status.error))
+	{
+		if (!String.isNullOrEmpty(status.armed_file))
+		{
+			//disableButton("load");
+			if (selectOption(status.armed_file))
+			{
+				if (status.is_playing)
+				{
+					disableButton("play");
+					enableButton("stop");
+				}
+				else
+				{
+					disableButton("stop");
+					enableButton("play");
+				}
+			}
+			else
+			{
+				videoListOnChange();
+			}
+			//$("#videoList")[0].disabled = true;
+			//displayStatusMessage("Video playback started successfully", false);
+		}
+
+		if (callback != null && typeof (callback) == "function")
+		{
+			callback();
+		}
+	}
+}
+
+function getStatusOnError(xmlHttpRequest, status, errorThrown)
+{
+	var junk = status;
+}
+
+function getNormalizedFilename(filename)
+{
+	//var regex = new RegExp("\[.]*");
+	var replaced = filename.replace(/[.]/g, "");
+	return replaced;
+}
+
+function selectOption(filename)
+{
+	var option = $("#" + getNormalizedFilename(filename));
+	clearSelectedOptions();
+	//option.removeClass("selected");
+	option.addClass("loaded");
+	return option.length > 0;
+}
+
+function clearSelectedOptions()
+{
+	$(".selected").each(function (index, item) { $(this).removeClass("selected"); });
+}
+
+function clearLoadedOptions()
+{
+	$(".loaded").each(function (index, item) { $(this).removeClass("loaded"); });
+
+}
+
+function initialize()
+{
+	var checkStatusCallback = function ()
+	{
+		$("#bodyPanel").fadeIn(1000);
+		beginCheckingStatus();
+	}
+
+	var getFileListCallback = function ()
+	{
+		getStatus(checkStatusCallback);
+		beginCheckingFileList();
+	}
+	getFileList(getFileListCallback);
 }

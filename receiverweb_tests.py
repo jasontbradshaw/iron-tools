@@ -8,7 +8,7 @@ import re
 class ReceiverWebTests(unittest.TestCase):
     def setUp(self):
         self.app = receiverweb.app.test_client()
-
+    
     def tearDown(self):
         """
         We have to basically manually reset state of the app here.  For
@@ -25,7 +25,7 @@ class ReceiverWebTests(unittest.TestCase):
     def test_home(self):
         rv = self.app.get('/')
         assert '/static/receiver/index.html' in rv.data
-
+    
     def test_stop(self):
         """
         Make sure stop does nothing if nothing is playing.
@@ -48,14 +48,14 @@ class ReceiverWebTests(unittest.TestCase):
         js = json.loads(rv.data)
         assert 'file_list' in js
 
-    def test_commit_time(self):
+    def test_load_commit_time(self):
         """
         Loading a 'fake' commit time returns 'None'.
         """
         
         result = receiverweb.load_commit_time('fake_test')
         assert result == None
-
+    
     def test_arm(self):
         """
         Asserts that fake_test.dump did not exist and proper error was
@@ -65,7 +65,7 @@ class ReceiverWebTests(unittest.TestCase):
         rv = self.app.get('/arm/fake_test.dump')
         js = json.loads(rv.data)
         assert js['error'] == "could not find file 'fake_test.dump'."
-
+        
         rv2 = self.app.get('/get_status')
         js2 = json.loads(rv2.data)
         assert js2['file'] == None
@@ -79,7 +79,7 @@ class ReceiverWebTests(unittest.TestCase):
         rv = self.app.get('/play')
         js = json.loads(rv.data)
         assert js['warning'] == 'rtpplay is not alive, no signal sent.'
-
+        
         rv2 = self.app.get('/get_status')
         js2 = json.loads(rv2.data)
         assert js2['file'] == None
@@ -102,15 +102,15 @@ class ReceiverWebTests(unittest.TestCase):
         
         rv = self.app.get('/play')
         js = json.loads(rv.data)
-
+        
         rv2 = self.app.get('/get_status')
         js2 = json.loads(rv2.data)
         assert js2['file'] == None
         assert js2['is_playing'] == False
-
+        
         rv = self.app.get('/stop')
         js = json.loads(rv.data)
-
+        
         assert js2['file'] == None
         assert js2['is_playing'] == False
 

@@ -3,8 +3,10 @@ import threading
 
 def get_time():
     """
-    Platform independent time based on an integer seconds.
+    Returns the time as an integer number of seconds.  Prevents getting a
+    float back from OS X.
     """
+    
     return int(time.time())
 
 def block_until(condition_func, max_time):

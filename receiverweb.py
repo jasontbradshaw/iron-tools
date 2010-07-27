@@ -61,12 +61,12 @@ def load_commit_time(filename, extension="time"):
     
     # return 'None' if we failed to get the time for any reason
     return num
-    
+
 @app.route("/")
 def index():
     log.debug("called /")
     
-    return flask.redirect("/static/receiver/index.html")
+    return flask.render_template("receiver.html")
 
 @app.route("/dev")
 def devinterace():

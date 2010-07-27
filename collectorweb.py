@@ -72,7 +72,7 @@ def write_commit_file(filename, t, extension="time"):
 def index():
     log.debug("called /")
     
-    return flask.redirect("/static/collector/index.html")
+    return flask.render_template("recorder.html")
 
 @app.route("/dev")
 def devinterface():

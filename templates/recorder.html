@@ -1,0 +1,62 @@
+<html>
+<head>
+    <title>Live Stream Recorder</title>
+    <script type="text/javascript" src="static/common/scripts/common.js"></script>
+    <script type="text/javascript" src="static/common/scripts/jquery-1.4.1.js"></script>
+    <script type="text/javascript" src="static/recorder/scripts/recorder.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/common/styles/common.css" />
+    <link rel="stylesheet" type="text/css" href="static/recorder/styles/recorder.css" />
+</head>
+<body>
+    <div id="statusPanel" class="status" style="display: none">
+    </div>
+    <div id="bodyPanel" style="display: none;">
+    <div id="recordPanel" class="panel">
+        <p class="panelTitle">
+            Record Video</p>
+        <div class="panelBody">
+            <div id="elapsedTime" class="elapsedTime">
+            </div>
+            <div id="buttonPanel" class="buttonPanel">
+                    <img id="record" title="Start Recording" class="button" src="static/common/images/blue/record.png"
+                        normalsrc="static/common/images/blue/record.png" onmouseoversrc="static/common/images/blue-hot/record.png"
+                        onmousedownsrc="static/common/images/red/record.png" disabledsrc="static/common/images/white/record.png"
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                    onclick="startRecording(this)" />
+                    <img id="stop" title="Stop Recording" class="button" src="static/common/images/blue/stop.png"
+                        normalsrc="static/common/images/blue/stop.png" onmouseoversrc="static/common/images/blue-hot/stop.png"
+                        onmousedownsrc="static/common/images/red/stop.png" disabledsrc="static/common/images/white/stop.png"
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                    onclick="stopRecording(this)" />
+            </div>
+        </div>
+    </div>
+    <div id="previewPanel" class="panel">
+        <p class="panelTitle">
+            Preview Playback</p>
+        <div class="panelBody">
+            <p class="label">
+                Start Time</p>
+                <input type="text" id="committedTime" class="committedTime" onfocus="onFocus(this);"
+                    onblur="onBlur(this);" />
+                <p class="label">
+                    Preview Length (seconds)</p>
+                <input type="text" id="duration" class="uncommittedTime" onchange="" />
+                <img id="preview" title="Preview" class="button" src="static/common/images/blue/play.png"
+                    normalsrc="static/common/images/blue/play.png" onmouseoversrc="static/common/images/blue-hot/play.png"
+                    onmousedownsrc="static/common/images/red/play.png" disabledsrc="static/common/images/white/play.png"
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                    onclick="previewPlayback(this)" />
+                <img id="save" title="Save Start Time" class="button" src="static/common/images/blue/save-rotated.png"
+                    normalsrc="static/common/images/blue/save-rotated.png" onmouseoversrc="static/common/images/blue-hot/save-rotated.png"
+                    onmousedownsrc="static/common/images/red/save-rotated.png" disabledsrc="static/common/images/white/save-rotated.png"
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                    onclick="saveStartTime(this)" />
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        checkStatus(function () { $("#bodyPanel").fadeIn(1000); });
+    </script>
+</body>
+</html>

@@ -341,10 +341,10 @@ function getStatusOnComplete(status, callback)
 {
 	if (String.isNullOrEmpty(status.error))
 	{
-		if (!String.isNullOrEmpty(status.armed_file))
+		if (!String.isNullOrEmpty(status.file))
 		{
 			//disableButton("load");
-			if (selectOption(status.armed_file))
+			if (selectOption(status.file))
 			{
 				if (status.is_playing)
 				{

@@ -136,8 +136,8 @@ class Recorder:
             
             # since we ended the process, we reset the start time
             self.start_time = None
-        
-        return final_status
+            
+            return final_status
     
     def get_status(self):
         """

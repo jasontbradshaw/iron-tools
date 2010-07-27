@@ -17,6 +17,13 @@ h2 {
     font-weight: normal;
 }
 
+.main {
+    margin-left: auto;
+    margin-right: auto;
+    width: 348px;
+}
+
+
 .button
 {
 	height:60px;
@@ -33,7 +40,6 @@ h2 {
     background-color: #595265;
     /*border: 2px solid #BEDB89;*/
     border: 2px solid #817694;
-	float:left;
 	clear:left;	
 	margin:10px;
 	padding: 14px 10px;;

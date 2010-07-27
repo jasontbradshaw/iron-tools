@@ -15,3 +15,4 @@ tags
 Makefile
 .deps
 config.status
+.DS_Store

@@ -144,10 +144,17 @@ def arm(file_name):
     
     log.debug("called /arm/%s" % file_name)
 
-    # don't arm again if already running
+    # only arm again if currently alive and not playing
     if rtpplay.isalive():
-        log.warning("arm: rtpplay already running")
-        return flask.jsonify(warning="rtpplay is already running.")
+        with glob:
+            # don't allow arming if playback is happening
+            if glob["is_playing"]:
+                msg = "arm: cannot arm a file during playback."
+                log.error(msg)
+                return flask.jsonify(error=msg)
+            
+        # kill the old armed process and arm a new one if not playing
+        rtpplay.stop()
     
     path = os.path.join(DUMP_DIR, file_name)
     

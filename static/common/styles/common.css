@@ -36,14 +36,13 @@ h2 {
 
 .panel
 {
-    background-color: #ECF3E3;
     /*background-color: #EDEDED;*/
     background-color: #595265;
     /*border: 2px solid #BEDB89;*/
     border: 2px solid #817694;
 	clear:left;	
 	margin:10px;
-	padding: 14px 10px;;
+	padding: 14px 10px;
     /*width: 310px;*/
 
     -moz-border-radius: 20px;
@@ -76,13 +75,13 @@ h2 {
 .status
 {
 	/*font-family:Verdana;*/
+    font-size: 32px;
 	text-align:center;
-	font-weight:bold;
 }
 
 .statusError
 {
-	background-color:Red;
+	background-color: #BF4570;
 }
 
 .hidden

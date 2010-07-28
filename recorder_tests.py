@@ -76,6 +76,8 @@ class RecorderTests(unittest.TestCase):
         assert commit_time is None
         assert elapsed_time is None
         assert not is_recording
+
+    # TODO: test commit_time
     
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(RecorderTests)

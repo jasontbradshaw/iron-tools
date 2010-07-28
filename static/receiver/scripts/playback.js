@@ -1,7 +1,9 @@
 ﻿var sortedResult;
 
-function createElement(tag, id, className, value)
+function createElement(tag, id, className, text, value)
 {
+	//var ui = new UI();
+	
 	var element = $("<" + tag + "/>");
 
 	if (!String.isNullOrEmpty(id))
@@ -11,9 +13,14 @@ function createElement(tag, id, className, value)
 
 	element.addClass(className);
 
-	if (!String.isNullOrEmpty(value))
+	if (!String.isNullOrEmpty(text))
 	{
-		element.text(value);
+		element.text(text);
+	}
+
+	if(!String.isNullOrEmpty(value))
+	{
+		element.val(value);
 	}
 	return element;
 }
@@ -56,12 +63,19 @@ function createOrUpdateListItem(item)
 		$("*", element).remove();
 	}
 
-	element.append(createElement("div", null, "filename", item.filename));
+	element.append(createElement("div", null, "filename", item.filename, item.filename));
 	var startTimeStyle = item.start_time_received ? "" : "startTimeMissing ";
 	startTimeStyle = startTimeStyle + "startTime";
-	element.append(createElement("div", null, startTimeStyle, getStartTimeMessage(item.start_time_received)));
-	element.append(createElement("div", null, "fileSize", getFileSizeMessage(item.file_size)));
+	element.append(createElement("div", null, startTimeStyle, getStartTimeMessage(item.start_time_received), item.start_time_received.toString()));
+	element.append(createElement("div", null, "fileSize", getFileSizeMessage(item.file_size), item.file_size));
 	return element;
+}
+
+function getSelectedItemStartTime()
+{
+	var selectedItem = $(".selected");
+	var startTime = $(".startTime", selectedItem).val();
+	return startTime == "true";
 }
 
 function populateFileList(data)
@@ -79,6 +93,8 @@ function populateFileList(data)
 	else
 	{
 		var i;
+		var selectedItemStart = getSelectedItemStartTime();
+
 		for (i = 0; i < data.length; i++)
 		{
 			list.prepend(createOrUpdateListItem(data[i]));
@@ -93,6 +109,10 @@ function populateFileList(data)
 		var index = i - 1;
 		$(".videoItem:gt(" + index + ")", list).remove();
 
+		if (selectedItemStart != getSelectedItemStartTime())
+		{
+			loadVideo($(".selected"));
+		}
 //		for (var j = list.children()..length - 1; j >= i; j--)
 //		{
 //			list.children().re
@@ -202,23 +222,22 @@ function getFileListOnError(xmlHttpRequesget, status, errorThrown)
 
 function loadVideo(option)
 {
-	//    if (!loadButton.disabled)
-	//    {
-	//var list = $("#videoList")[0];
-	var selectedOptionJs = $(".filename", option);
-	var selectedOption = selectedOptionJs.text();
-	//var selectedOption = list.options[list.selectedIndex].value;
-	if (String.isNullOrEmpty(selectedOption))
+	var selectedOption = $(".filename", option).text();
+	var startTime = getSelectedItemStartTime();
+
+	if (startTime)
 	{
-		alert("Please select a video to load");
+		if (String.isNullOrEmpty(selectedOption))
+		{
+			alert("Please select a video to load");
+		}
+		else
+		{
+			var params = new Array();
+			params.push(selectedOption);
+			getJSON("../../arm", params, true, loadVideoOnComplete, loadVideoOnError);
+		}
 	}
-	else
-	{
-		var params = new Array();
-		params.push(selectedOption);
-		getJSON("../../arm", params, true, loadVideoOnComplete, loadVideoOnError);
-	}
-	//    }
 }
 
 function loadVideoOnComplete(status)
@@ -344,7 +363,7 @@ function getStatusOnComplete(status, callback)
 		if (!String.isNullOrEmpty(status.file))
 		{
 			//disableButton("load");
-			if (selectOption(status.file))
+			if (selectLoadedOption(status.file))
 			{
 				if (status.is_playing)
 				{
@@ -380,11 +399,11 @@ function getStatusOnError(xmlHttpRequest, status, errorThrown)
 function getNormalizedFilename(filename)
 {
 	//var regex = new RegExp("\[.]*");
-	var replaced = filename.replace(/[.]/g, "");
+	var replaced = filename.replace(/[.:]/g, "");
 	return replaced;
 }
 
-function selectOption(filename)
+function selectLoadedOption(filename)
 {
 	var option = $("#" + getNormalizedFilename(filename));
 	clearSelectedOptions();

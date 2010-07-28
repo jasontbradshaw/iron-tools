@@ -44,7 +44,7 @@ class RTPPlay(RTPTools):
     def __init__(self, path="rtpplay"):
         """
         Builds an RTPPlay object, optionally with the path to the binary
-        rtpplay file and the name of the armed flag file.
+        rtpplay file.
         """
 
         # init parent for its precious methodly fluids
@@ -67,7 +67,7 @@ class RTPPlay(RTPTools):
         
         with self.lock:
             # make sure file exists before running rtpplay
-            if not os.path.isfile(inputfile):
+            if not os.path.exists(inputfile):
                 raise IOError("Input file '%s' not found." % inputfile)
 
             # only launch if process isn't already running or isn't alive
@@ -141,3 +141,51 @@ class RTPDump(RTPTools):
                 self.proc = sp.Popen(args)
         
         return self.pid()
+
+class RTPPlayEmulator:
+    """Emulate RTPPlay class."""
+
+    def __init__(self):
+        self.proc_running = False
+        self.file_exists = os.path.exists
+
+    def start(self, inputfile, address, port, start_time=None, end_time=None,
+              wait_start=False):
+        if not self.file_exists(inputfile):
+            raise IOError("Input file '%s' not found." % inputfile)
+
+        self.proc_running = True
+        return self.pid()
+
+    def stop(self):
+        self.proc_running = False
+
+    def pid(self):
+        return -1
+
+    def isalive(self):
+        return self.proc_running
+
+    def begin_playback(self):
+        pass
+
+class RTPDumpEmulator:
+    """Emulate RTPDump class."""
+
+    def __init__(self):
+        self.proc_running = False
+
+    def start(self, outputfile, address, port, dump_format="dump"):
+        self.proc_running = True
+        return self.pid()
+
+    def stop(self):
+        self.proc_running = False
+
+    def pid(self):
+        if self.proc_running:
+            return -1
+        return None
+
+    def isalive(self):
+        return self.proc_running

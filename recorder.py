@@ -7,16 +7,16 @@ import threading
 
 class ProcessAlreadyRunningError(Exception):
     """Indicates an attempt to start the same process twice."""
-    pass
 
 class ProcessOperationTimeoutError(Exception):
     """Indicates a process operation that timed out."""
-    pass
 
 class NoRecordedFileError(Exception):
     """Indicates an attempt to commit a time without a previous recording."""
-    pass
 
+class FileNotFoundError(Exception):
+    """File was not found."""
+    
 class Recorder:
     """
     Manages processes and state for playing and recording RTP streams.
@@ -50,6 +50,9 @@ class Recorder:
         # maximum time we will wait for a process to complete an action
         self.max_block_time = 3
         
+        # replaced with custom function in unit tests
+        self.file_exists = os.path.exists
+
         # make sure we have the directory structure we'll need
         self._create_dirs()
         
@@ -67,11 +70,11 @@ class Recorder:
         """
         
         # create sync directory
-        if not os.path.exists(self.sync_dir):
+        if not self.file_exists(self.sync_dir):
             os.makedirs(self.sync_dir)
         
         # create dump directory
-        if not os.path.exists(self.dump_dir):
+        if not self.file_exists(self.dump_dir):
             os.makedirs(self.dump_dir)
     
     def _write_commit_file(self, filename, t):
@@ -104,7 +107,7 @@ class Recorder:
                             util.generate_file_name(self.video_basename))
             
             # start the process
-            rtpdump.start(dump_file, self.dump_address, self.dump_port)
+            self.rtpdump.start(dump_file, self.dump_address, self.dump_port)
             
             if not util.block_until(self.rtpdump.isalive, self.max_block_time):
                 msg = "rtpdump process failed to start within allotted time"
@@ -127,12 +130,12 @@ class Recorder:
             self.rtpdump.stop()
             
             # wait until it does, or throw an error if it doesn't
-            if not util.block_while(rtpdump.isalive, self.max_block_time):
+            if not util.block_while(self.rtpdump.isalive, self.max_block_time):
                 msg = "rtpdump process failed to end within the allotted time"
                 raise ProcessOperationTimeoutError(msg)
             
             # retrieve the final status before resetting it
-            final_status = self.get_status()
+            final_status = self._get_status()
             
             # since we ended the process, we reset the start time
             self.start_time = None
@@ -145,7 +148,10 @@ class Recorder:
         elapsed since the current recording started, and whether the
         rtpdump process is currently recording.
         """
-        
+        with self.__lock:
+            return self._get_status()
+            
+    def _get_status(self):
         elapsed_time = None
         if self.start_time is not None:
             elapsed_time = util.get_time() - self.start_time
@@ -163,7 +169,7 @@ class Recorder:
         
         with self.__lock:
             # prevent setting a commit time if no file has been dumped yet
-            if self.commit_time is None:
+            if self.dump_file is None:
                 msg = ("commit time can only be set if at least one file"
                        "has been recorded this session")
                 raise NoRecordedFileError(msg)
@@ -188,24 +194,24 @@ class Recorder:
                 raise NoRecordedFileError(msg)
             
             # ensure the file we are trying to play exists already
-            if not os.path.exists(self.dump_file):
+            if not self.file_exists(self.dump_file):
                 msg = ("could not find dump file '%s' for preview" %
                        self.dump_file)
-                raise IOError(msg)
+                raise FileNotFoundError(msg)
             
             # end the current preview before starting another one
-            rtpplay.stop()
+            self.rtpplay.stop()
             
-            if not util.block_while(rtpplay.isalive, self.max_block_time):
+            if not util.block_while(self.rtpplay.isalive, self.max_block_time):
                 msg = "failed to terminate previously running rtpplay process"
                 raise ProcessOperationTimeoutError(msg)
             
             # attempt to play the given file
-            rtpplay.start(self.dump_file, self.preview_address,
+            self.rtpplay.start(self.dump_file, self.preview_address,
                           self.preview_port, start_time=start_time,
                           end_time=start_time + duration)
             
             # wait until the process starts
-            if not util.block_until(rtpplay.isalive, self.max_block_time):
+            if not util.block_until(self.rtpplay.isalive, self.max_block_time):
                 msg = "rtpplay failed to start or exited very quickly"
                 raise ProcessOperationTimeoutError(msg)

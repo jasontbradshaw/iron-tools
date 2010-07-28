@@ -120,16 +120,43 @@ class CollectorWebTests(unittest.TestCase):
         assert 'error' in js
         assert js['error'] == "no recording started, unable to preview."
 
-    def test_play_preview_param(self):
+    def test_stop_end_state(self):
         """
-        Does playing a preview with any parameter work?
+        Checks the changes to the record status caused by /stop_record
         """
         
         self.app.get('/start_record')
-        time.sleep(3)
+        time.sleep(1)
         rv = self.app.get('/stop_record')
         js = json.loads(rv.data)
-        
+        assert js['committed_time'] != 0
+        assert js['is_recording'] == false
+
+        rv = self.app.get('/get_record_status')
+        js = json.loads(rv.data)
+        assert js['committed_time'] == 0
+
+    def test_start_state_change(self):
+        """
+        Checks that start_record changes status correctly
+        """
+
+        self.app.get('/start_record')
+        rv = self.app.get('/get_record_status')
+        js = json.loads(rv.data)
+        assert js['committed_time'] == 0
+
+        self.app.get('/commit_time/5')
+        rv = self.app.get('/get_record_status')
+        js = json.loads(rv.data)
+        assert js['committed_time'] == 5
+
+        self.app.get('/start_record')
+        rv = self.app.get('/get_record_status')
+        js = json.loads(rv.data)
+        assert js['committed_time'] == 0
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(CollectorWebTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -1,22 +1,12 @@
-import util
-import rtp
 import logging
 import time
 import os
 import threading
 
-class ProcessAlreadyRunningError(Exception):
-    """Indicates an attempt to start the same process twice."""
+import util
+import rtp
+from exceptions import *
 
-class ProcessOperationTimeoutError(Exception):
-    """Indicates a process operation that timed out."""
-
-class NoRecordedFileError(Exception):
-    """Indicates an attempt to commit a time without a previous recording."""
-
-class FileNotFoundError(Exception):
-    """File was not found."""
-    
 class Recorder:
     """
     Manages processes and state for playing and recording RTP streams.
@@ -144,14 +134,21 @@ class Recorder:
     
     def get_status(self):
         """
-        Returns a tuple of the current commit time, the amount of time
-        elapsed since the current recording started, and whether the
-        rtpdump process is currently recording.
+        External, thread-safe version of get_status.
         """
+        
         with self.__lock:
             return self._get_status()
             
     def _get_status(self):
+        """
+        Returns a tuple of the current commit time, the amount of time
+        elapsed since the current recording started, and whether the
+        rtpdump process is currently recording.
+        
+        Not thread-safe, intended for internal use only.
+        """
+        
         elapsed_time = None
         if self.start_time is not None:
             elapsed_time = util.get_time() - self.start_time

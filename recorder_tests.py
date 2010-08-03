@@ -2,6 +2,7 @@ import unittest
 import time
 import rtp
 from recorder import *
+from it_exceptions import *
 
 class RecorderTests(unittest.TestCase):
     def setUp(self):
@@ -78,6 +79,35 @@ class RecorderTests(unittest.TestCase):
         assert not is_recording
 
     # TODO: test commit_time
+    def testCommitTime(self):
+        # say that self.r.dump_file "exists"
+        self.r.file_exists = lambda f : True
+        self.r.rtpplay.file_exists = lambda f : True
+        self._write_commit_file = lambda a, b : None
+
+        self.r.start_record()
+
+        commit_time, elapsed_time, is_recording = self.r.get_status()
+        assert commit_time is None
+        assert elapsed_time is not None
+        assert is_recording
+
+        self.r.commit_time(345)
+
+        commit_time, elapsed_time, is_recording = self.r.get_status()
+        assert commit_time == 345
+        assert elapsed_time is not None
+        assert is_recording
+
+        self.r.commit_time(-39)
+
+        commit_time, elapsed_time, is_recording = self.r.get_status()
+        assert commit_time == -39
+
+        self.r.commit_time(0)
+
+        commit_time, elapsed_time, is_recording = self.r.get_status()
+        assert commit_time == 0
     
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(RecorderTests)

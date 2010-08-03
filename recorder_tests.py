@@ -5,6 +5,12 @@ from recorder import *
 from it_exceptions import *
 
 class RecorderTests(unittest.TestCase):
+    def no_side_effects(self):
+        # say that self.r.dump_file "exists"
+        self.r.file_exists = lambda f : True
+        self.r.rtpplay.file_exists = lambda f : True
+        self._write_commit_file = lambda a, b : None
+
     def setUp(self):
         self.r = Recorder()
         self.r.rtpplay = rtp.RTPPlayEmulator()
@@ -25,6 +31,10 @@ class RecorderTests(unittest.TestCase):
         assert commit_time is None
         assert elapsed_time is not None
         assert is_recording
+
+    def testStartRecordStartRecord(self):
+        self.r.start_record()
+        self.assertRaises(ProcessAlreadyRunningError, self.r.start_record)
 
     def testStopRecordBeforeStart(self):
         self.r.stop_record()
@@ -53,9 +63,7 @@ class RecorderTests(unittest.TestCase):
         self.assertRaises(FileNotFoundError, self.r.play_preview, 10)
         
     def testPlayPreview2(self):
-        # say that self.r.dump_file "exists"
-        self.r.file_exists = lambda f : True
-        self.r.rtpplay.file_exists = lambda f : True
+        self.no_side_effects()
 
         self.r.start_record()
 
@@ -78,12 +86,13 @@ class RecorderTests(unittest.TestCase):
         assert elapsed_time is None
         assert not is_recording
 
-    # TODO: test commit_time
+    def testCommitTimeWithoutStarting(self):
+        self.no_side_effects()
+
+        self.assertRaises(NoRecordedFileError, self.r.commit_time, 345)
+
     def testCommitTime(self):
-        # say that self.r.dump_file "exists"
-        self.r.file_exists = lambda f : True
-        self.r.rtpplay.file_exists = lambda f : True
-        self._write_commit_file = lambda a, b : None
+        self.no_side_effects()
 
         self.r.start_record()
 

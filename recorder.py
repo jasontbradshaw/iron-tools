@@ -5,7 +5,7 @@ import threading
 
 import util
 import rtp
-from exceptions import *
+from it_exceptions import *
 
 class Recorder:
     """
@@ -44,28 +44,15 @@ class Recorder:
         self.file_exists = os.path.exists
 
         # make sure we have the directory structure we'll need
-        self._create_dirs()
+        util.create_dirs(self.sync_dir, self.dump_dir)
         
         # make sure critical operations are atomic
         self.__lock = threading.Lock()
         
         # state variables
-        self.commit_time = None
-        self.start_time = None
-        self.dump_file = None
-    
-    def _create_dirs(self):
-        """
-        Creates the sync and dump directories if they don't already exist.
-        """
-        
-        # create sync directory
-        if not self.file_exists(self.sync_dir):
-            os.makedirs(self.sync_dir)
-        
-        # create dump directory
-        if not self.file_exists(self.dump_dir):
-            os.makedirs(self.dump_dir)
+        self._commit_time = None
+        self._start_time = None
+        self._dump_file = None
     
     def _write_commit_file(self, filename, t):
         """
@@ -104,9 +91,9 @@ class Recorder:
                 raise ProcessOperationTimeoutError(msg)
             
             # set state variables to correspond to new file if process started
-            self.commit_time = None
-            self.start_time = util.get_time()
-            self.dump_file = dump_file
+            self._commit_time = None
+            self._start_time = util.get_time()
+            self._dump_file = dump_file
     
     def stop_record(self):
         """
@@ -128,7 +115,7 @@ class Recorder:
             final_status = self._get_status()
             
             # since we ended the process, we reset the start time
-            self.start_time = None
+            self._start_time = None
             
             return final_status
     
@@ -150,13 +137,13 @@ class Recorder:
         """
         
         elapsed_time = None
-        if self.start_time is not None:
-            elapsed_time = util.get_time() - self.start_time
+        if self._start_time is not None:
+            elapsed_time = util.get_time() - self._start_time
         
         is_recording = self.rtpdump.isalive()
         
         # we ensure the types of all this outgoing data
-        return self.commit_time, elapsed_time, is_recording
+        return self._commit_time, elapsed_time, is_recording
     
     def commit_time(self, t):
         """
@@ -166,17 +153,17 @@ class Recorder:
         
         with self.__lock:
             # prevent setting a commit time if no file has been dumped yet
-            if self.dump_file is None:
+            if self._dump_file is None:
                 msg = ("commit time can only be set if at least one file"
                        "has been recorded this session")
                 raise NoRecordedFileError(msg)
             
             # set the actual commit time
-            self.commit_time = t
+            self._commit_time = int(t)
             
             # get the base name of the dump file and write a commit file for it
-            base_dump_filename = os.path.basename(self.dump_file)
-            self._write_commit_file(base_dump_filename, self.commit_time)
+            base_dump_filename = os.path.basename(self._dump_file)
+            self._write_commit_file(base_dump_filename, self._commit_time)
     
     def play_preview(self, start_time, duration=30):
         """
@@ -186,14 +173,14 @@ class Recorder:
         
         with self.__lock:
             # make sure something has been recorded before previewing
-            if self.dump_file is None:
+            if self._dump_file is None:
                 msg = "a recording must have been started to enable preview"
                 raise NoRecordedFileError(msg)
             
             # ensure the file we are trying to play exists already
-            if not self.file_exists(self.dump_file):
+            if not self.file_exists(self._dump_file):
                 msg = ("could not find dump file '%s' for preview" %
-                       self.dump_file)
+                       self._dump_file)
                 raise FileNotFoundError(msg)
             
             # end the current preview before starting another one
@@ -204,7 +191,7 @@ class Recorder:
                 raise ProcessOperationTimeoutError(msg)
             
             # attempt to play the given file
-            self.rtpplay.start(self.dump_file, self.preview_address,
+            self.rtpplay.start(self._dump_file, self.preview_address,
                           self.preview_port, start_time=start_time,
                           end_time=start_time + duration)
             

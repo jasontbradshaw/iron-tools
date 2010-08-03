@@ -1,3 +1,4 @@
+import os
 import time
 import threading
 
@@ -56,6 +57,24 @@ def generate_file_name(basename, extension="dump"):
     
     # create the file name in format: <timestamp><basename>.<extension>
     return time.strftime(timeformat) + basename + "." + extension
+
+def create_dirs(*args):
+    """
+    Creates all the given directory structures.  If the argument is a string,
+    it is treated as a single directory.  If an argument is a tuple, it is
+    treated as a nested directory structure and is joined prior to being
+    created.
+    """
+    
+    # create all the given directories
+    for f in args:
+        # join tuples into a string, or default to treating f as a string
+        fname = str(f)
+        if type(f) is type(tuple([])):
+            fname = os.path.join(*f)
+        
+        if not os.path.exists(fname):
+            os.makedirs(os.path.normpath(fname))
 
 class UnlockedAccessError(Exception):
     """

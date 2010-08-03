@@ -18,3 +18,8 @@ class FileNotFoundError(Exception):
     """
     Indicates that a file could not be found.
     """
+
+class InvalidOperationError(Exception):
+    """
+    Raised when a given operation is invalid in the context of current state.
+    """

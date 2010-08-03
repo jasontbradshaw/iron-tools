@@ -44,9 +44,6 @@ if ENVIRONMENT == ENV_DEV:
     #Recorder strings
     VIDEO_BASENAME = "_sermon"
 
-    #Shared strings
-    FILE_NOT_FOUND = "could not find file '%s'."
-
 elif ENVIRONMENT == ENV_PRODUCTION:
     #Shared Vars
     SYNC_DIR = "sync"
@@ -66,9 +63,6 @@ elif ENVIRONMENT == ENV_PRODUCTION:
 
     #Recorder strings
     VIDEO_BASENAME = "_sermon"
-
-    #Shared strings
-    FILE_NOT_FOUND = "could not find file '%s'."
 
 else:
     raise NotImplemented("'%s' not a supported environment." % ENVIRONMENT)

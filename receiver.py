@@ -23,24 +23,16 @@ class Receiver:
         
         self.max_block_time = 3
         
-        self._create_dirs()
+        util.create_dirs(self.sync_dir, self.dump_dir)
 
         self._is_playing = False
         self._armed_file = None
+
+        # replaced with custom function in unit tests
+        self.file_exists = os.path.exists
+        self.file_getsize = os.path.getsize
+        self.listdir = os.listdir
         
-    def _create_dirs(self):
-        """
-        Creates the sync and dump directories if they don't already exist.
-        """
-        
-        # create sync directory
-        if not self.file_exists(self.sync_dir):
-            os.makedirs(self.sync_dir)
-        
-        # create dump directory
-        if not self.file_exists(self.dump_dir):
-            os.makedirs(self.dump_dir)
-    
     def _load_commit_time(self, filename, extension="time"):
         """
         Loads a commit time from a file and return it as an integer.
@@ -48,7 +40,7 @@ class Receiver:
         'filename' is the name of a video file founnd in the dump directory.
         """
         
-        dump_file = os.path.join(SYNC_DIR, filename + "." + extension)
+        dump_file = os.path.join(self.sync_dir, filename + "." + extension)
         
         # read file time, or 0 if we couldn't
         num = 0
@@ -92,8 +84,8 @@ class Receiver:
         with self.__lock:
             # try to fill the list with files in the given path
             dirlist = []
-            if os.path.exists(DUMP_DIR):
-                dirlist = os.listdir(DUMP_DIR)
+            if self.file_exists(self.dump_dir):
+                dirlist = self.listdir(self.dump_dir)
             
             # sort directory before returning
             dirlist.sort()
@@ -101,10 +93,10 @@ class Receiver:
             result_files = []
             for f in dirlist:
                 # get the size of the current file in bytes
-                size = os.path.getsize(os.path.join(DUMP_DIR, f))
+                size = self.file_getsize(os.path.join(self.dump_dir, f))
                 
                 # determine if we received a commit time for the file
-                commit_file = os.path.join(SYNC_DIR, f + "." + extension)
+                commit_file = os.path.join(self.sync_dir, f + "." + extension)
                 commit_time = self._load_commit_time(f)
                 
                 # add them all to the list as a dict of attributes
@@ -132,10 +124,10 @@ class Receiver:
                 # kill the old armed process and arm a new one if not playing
                 self.rtpplay.stop()
         
-            path = os.path.join(DUMP_DIR, file_name)
+            path = os.path.join(self.dump_dir, file_name)
             
             # ensure the file exists
-            if not os.path.isfile(path):
+            if not self.file_exists(path):
                 msg = "could not find file '%s' to arm." % file_name
                 raise FileNotFoundError(msg)
             

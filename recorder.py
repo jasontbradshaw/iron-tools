@@ -44,7 +44,7 @@ class Recorder:
         self.file_exists = os.path.exists
 
         # make sure we have the directory structure we'll need
-        self._create_dirs()
+        util.create_dirs(self.sync_dir, self.dump_dir)
         
         # make sure critical operations are atomic
         self.__lock = threading.Lock()
@@ -53,19 +53,6 @@ class Recorder:
         self._commit_time = None
         self._start_time = None
         self._dump_file = None
-    
-    def _create_dirs(self):
-        """
-        Creates the sync and dump directories if they don't already exist.
-        """
-        
-        # create sync directory
-        if not self.file_exists(self.sync_dir):
-            os.makedirs(self.sync_dir)
-        
-        # create dump directory
-        if not self.file_exists(self.dump_dir):
-            os.makedirs(self.dump_dir)
     
     def _write_commit_file(self, filename, t):
         """

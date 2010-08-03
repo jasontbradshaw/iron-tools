@@ -1,22 +1,12 @@
-import util
-import rtp
 import logging
 import time
 import os
 import threading
 
-class ProcessAlreadyRunningError(Exception):
-    """Indicates an attempt to start the same process twice."""
+import util
+import rtp
+from exceptions import *
 
-class ProcessOperationTimeoutError(Exception):
-    """Indicates a process operation that timed out."""
-
-class NoRecordedFileError(Exception):
-    """Indicates an attempt to commit a time without a previous recording."""
-
-class FileNotFoundError(Exception):
-    """File was not found."""
-    
 class Recorder:
     """
     Manages processes and state for playing and recording RTP streams.

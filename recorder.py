@@ -144,14 +144,21 @@ class Recorder:
     
     def get_status(self):
         """
-        Returns a tuple of the current commit time, the amount of time
-        elapsed since the current recording started, and whether the
-        rtpdump process is currently recording.
+        External, thread-safe version of get_status.
         """
+        
         with self.__lock:
             return self._get_status()
             
     def _get_status(self):
+        """
+        Returns a tuple of the current commit time, the amount of time
+        elapsed since the current recording started, and whether the
+        rtpdump process is currently recording.
+        
+        Not thread-safe, intended for internal use only.
+        """
+        
         elapsed_time = None
         if self.start_time is not None:
             elapsed_time = util.get_time() - self.start_time

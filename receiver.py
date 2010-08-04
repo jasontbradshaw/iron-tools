@@ -161,7 +161,7 @@ class Receiver:
         with self.__lock:
             # warn if rtpplay is not yet running
             if not self.rtpplay.isalive():
-                msg = "rtpplay not running, could not arm."
+                msg = "rtpplay not running, could not begin playback."
                 raise InvalidOperationError(msg)
             
             # send the signal to start playback

@@ -10,21 +10,11 @@ class ReceiverWebTests(unittest.TestCase):
         self.app = receiverweb.app.test_client()
     
     def tearDown(self):
-        """
-        We have to basically manually reset state of the app here.  For
-        whatever reason, it persists between tests, and to ensure we get
-        a blank slate for every test, we have to wipe it ourselves.
-        """
+        pass
         
-        # kill rtp* processes
-        receiverweb.rtpplay.stop()
-        
-        # replace data store with a new one (clears all state)
-        receiverweb.glob = util.ThreadedDataStore()
-    
     def test_home(self):
         rv = self.app.get('/')
-        assert '/static/receiver/index.html' in rv.data
+        assert '/' in rv.data
     
     def test_stop(self):
         """
@@ -48,14 +38,6 @@ class ReceiverWebTests(unittest.TestCase):
         js = json.loads(rv.data)
         assert 'file_list' in js
 
-    def test_load_commit_time(self):
-        """
-        Loading a 'fake' commit time returns 'None'.
-        """
-        
-        result = receiverweb.load_commit_time('fake_test')
-        assert result == None
-    
     def test_arm(self):
         """
         Asserts that fake_test.dump did not exist and proper error was

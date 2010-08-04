@@ -1,4 +1,4 @@
-import receiverweb
+import receiver_web
 import unittest
 import json
 import time
@@ -7,7 +7,7 @@ import re
 
 class ReceiverWebTests(unittest.TestCase):
     def setUp(self):
-        self.app = receiverweb.app.test_client()
+        self.app = receiver_web.app.test_client()
     
     def tearDown(self):
         pass

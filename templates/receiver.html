@@ -9,7 +9,10 @@
 	<link type="text/css" rel="Stylesheet" href="static/receiver/styles/playback.css" />
     <script type="text/javascript">
         $(document).ready(function() {
-            document.addEventListener('touchmove', function(e){ e.preventDefault(); });
+            //document.addEventListener('touchmove', function(e){ e.preventDefault(); });
+            $(document).live('touchmove', function(e) {
+                e.preventDefault();
+            });
             videoScroll = new iScroll('videoListContainer');
         });
     </script>

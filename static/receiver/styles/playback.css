@@ -3,7 +3,7 @@
     z-index:1;
     height: 600px;
     overflow: auto;
-    
+    padding: 20px;
 }
 
 .videoList

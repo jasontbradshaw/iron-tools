@@ -66,18 +66,16 @@ h2 {
 
 .panelBody
 {
-	/*float:left;*/
-	/*clear:left;*/
-    /*margin-top: 0px;*/
 }
 
 .status
 {
-	/*font-family:Verdana;*/
     font-size: 300%;
     background-color: #fff;
     width: 100%;
 	text-align:center;
+    z-index: 2;
+    padding: 10px;
 }
 
 .statusError

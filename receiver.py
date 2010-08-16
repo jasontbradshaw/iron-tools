@@ -119,9 +119,13 @@ class Receiver:
                 # don't allow arming if playback is happening
                 if self._is_playing:
                     msg = "cannot arm a file during playback."
-                    raise InvalidOperationException(msg)
+                    raise InvalidOperationError(msg)
             
-                # kill the old armed process and arm a new one if not playing
+                # same file already armed
+                if file_name == self._armed_file:
+                    return
+
+                # kill the old armed process and arm a new one
                 self.rtpplay.stop()
         
             path = os.path.join(self.dump_dir, file_name)
@@ -135,7 +139,7 @@ class Receiver:
             commit_time = self._load_commit_time(file_name)
             if commit_time is None:
                 msg = "commit time is required to arm process."
-                raise InvalidOperationException(msg)
+                raise InvalidOperationError(msg)
             
             # attempt to play the given file
             self.rtpplay.start(path, self.play_address, self.play_port,
@@ -157,11 +161,11 @@ class Receiver:
         with self.__lock:
             # warn if rtpplay is not yet running
             if not self.rtpplay.isalive():
-                log.warning("play: rtpplay not running, no newline sent to process")
-                return flask.jsonify(warning="rtpplay is not alive, no signal sent.")
+                msg = "rtpplay not running, could not begin playback."
+                raise InvalidOperationError(msg)
             
             # send the signal to start playback
-            rtpplay.begin_playback()
+            self.rtpplay.begin_playback()
             
             # mark playback as started
             self._is_playing = True

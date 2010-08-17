@@ -1,13 +1,13 @@
-import playback_web
+import receiver_web
 import unittest
 import json
 import time
 import util
 import re
 
-class PlaybackWebTests(unittest.TestCase):
+class ReceiverWebTests(unittest.TestCase):
     def setUp(self):
-        self.app = playback_web.app.test_client()
+        self.app = receiver_web.app.test_client()
     
     def tearDown(self):
         pass
@@ -97,5 +97,5 @@ class PlaybackWebTests(unittest.TestCase):
         assert js2['is_playing'] == False
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(PlaybackWebTests)
+    suite = unittest.TestLoader().loadTestsFromTestCase(ReceiverWebTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

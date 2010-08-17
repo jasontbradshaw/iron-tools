@@ -1,16 +1,16 @@
 import unittest
 import time
 import rtp
-from playback import *
+from receiver import *
 from it_exceptions import *
 
-class PlaybackTests(unittest.TestCase):
+class ReceiverTests(unittest.TestCase):
     def no_side_effects(self):
         self.r.file_exists = lambda f : True
         self.r.file_getsize = lambda f : 1
 
     def setUp(self):
-        self.r = Playback()
+        self.r = Receiver()
         self.r.rtpplay = rtp.RTPPlayEmulator()
     
     def tearDown(self):
@@ -180,5 +180,5 @@ class PlaybackTests(unittest.TestCase):
         assert not is_playing
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(PlaybackTests)
+    suite = unittest.TestLoader().loadTestsFromTestCase(ReceiverTests)
     unittest.TextTestRunner(verbosity=2).run(suite)

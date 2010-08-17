@@ -16,7 +16,7 @@
     padding: 0px 12px;
 	font-weight:bold;
 	font-family:Courier New;
-    font-size: 600%;
+    font-size: 64px;
 
     -moz-border-radius: 20px;
     -webkit-border-radius: 20px;
@@ -34,7 +34,7 @@
     padding: 0px 12px;
 	font-weight:bold;
 	font-family:Courier New;
-    font-size: 600%;
+    font-size: 64px;
 	float:left;
 
     -moz-border-radius: 20px;
@@ -53,7 +53,7 @@
     padding: 0px;
 	font-weight:bold;
 	font-family:Courier New;
-    font-size: 600%;
+    font-size: 64px;
 	float:left;
 
      -moz-border-radius: 20px;
@@ -73,13 +73,15 @@
 }
 
 .time.gay {
+    width: 300px;
 }
 
 .time.nongay{
-    width: 100%;
+    width: 307px;
 }
 
 .time {
+    width: 310px;
 	background-color: #333333;
 	color: #817694;
 	text-align:center;
@@ -88,7 +90,7 @@
     margin-bottom: 16px;
 	font-weight:bold;
 	font-family:Courier New;
-    font-size: 120px;
+    font-size: 64px;
 	/*float:left;*/
 
      -moz-border-radius: 20px;

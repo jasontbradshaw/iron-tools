@@ -9,8 +9,8 @@ ENVIRONMENT = ENV_DEV
 SYNC_DIR = "sync"
 DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 
-#Playback config
-PLAYBACK_LOG_FILENAME = "playback.log"
+#Receiver config
+RECEIVER_LOG_FILENAME = "receiver.log"
 RTPPLAY_ADDRESS = "127.0.0.1"
 RTPPLAY_PORT = 5008
 
@@ -29,8 +29,8 @@ if ENVIRONMENT == ENV_DEV:
     SYNC_DIR = "sync"
     DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 
-    #Playback config
-    PLAYBACK_LOG_FILENAME = "playback.log"
+    #Receiver config
+    RECEIVER_LOG_FILENAME = "receiver.log"
     RTPPLAY_ADDRESS = "127.0.0.1"
     RTPPLAY_PORT = 5008
 
@@ -49,8 +49,8 @@ elif ENVIRONMENT == ENV_PRODUCTION:
     SYNC_DIR = "sync"
     DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 
-    #Playback config
-    PLAYBACK_LOG_FILENAME = "playback.log"
+    #Receiver config
+    RECEIVER_LOG_FILENAME = "receiver.log"
     RTPPLAY_ADDRESS = "127.0.0.1"
     RTPPLAY_PORT = 5008
 

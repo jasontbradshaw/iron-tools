@@ -7,16 +7,16 @@ import flask
 
 import util
 import rtp
-import playback
+import receiver
 
 app = flask.Flask(__name__)
-playback_obj = playback.Playback()
+receiver_obj = receiver.Receiver()
 
 # set up logging
-PLAYBACK_LOG_FILENAME = "playback.log"
-logging.basicConfig(filename=PLAYBACK_LOG_FILENAME, level=logging.NOTSET,
+RECEIVER_LOG_FILENAME = "receiver.log"
+logging.basicConfig(filename=RECEIVER_LOG_FILENAME, level=logging.NOTSET,
                     format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
-log = logging.getLogger("playback")
+log = logging.getLogger("receiver")
 
 # config variables
 RTPPLAY_ADDRESS = "127.0.0.1"#"10.98.0.81"
@@ -38,7 +38,7 @@ except OSError:
 def index():
     log.debug("called /")
     
-    return flask.render_template("playback.html")
+    return flask.render_template("receiver.html")
 
 @app.route("/dev")
 def devinterace():
@@ -64,7 +64,7 @@ def stop():
     
     # stop works even on a non-running process
     try:
-        playback_obj.stop()
+        receiver_obj.stop()
     except Exception, e:
         return flask.jsonify(error=str(e))
     
@@ -79,7 +79,7 @@ def get_file_list(extension="time"):
     log.debug("called /get_file_list")
     
     try:
-        results = playback_obj.get_file_list()
+        results = receiver_obj.get_file_list()
     except Exception, e:
         return flask.jsonify(error=str(e))
 
@@ -104,7 +104,7 @@ def arm(file_name):
     log.debug("called /arm/%s" % file_name)
 
     try:
-        playback_obj.arm(file_name)
+        receiver_obj.arm(file_name)
     except Exception, e:
         return flask.jsonify(error=str(e))
     
@@ -119,7 +119,7 @@ def play():
     log.debug("called /play")
     
     try:
-        playback_obj.play()
+        receiver_obj.play()
     except Exception, e:
         return flask.jsonify(error=str(e))
     
@@ -134,7 +134,7 @@ def get_status():
     log.debug("called /get_status")
     
     try:
-        armed_file, is_playing = playback_obj.get_status()
+        armed_file, is_playing = receiver_obj.get_status()
     except Exception, e:
         return flask.jsonify(error=str(e))
     

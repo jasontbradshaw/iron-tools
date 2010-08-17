@@ -5,6 +5,7 @@ import threading
 
 import util
 import rtp
+import config
 from it_exceptions import *
 
 class Recorder:
@@ -19,26 +20,26 @@ class Recorder:
         self.rtpdump = rtp.RTPDump()
         
         # rtpdump parameters
-        self.dump_address = "0.0.0.0"
-        self.dump_port = 5006
+        self.dump_address = config.RTPDUMP_ADDRESS
+        self.dump_port = config.RTPDUMP_PORT
         
         # rtpplay parameters
-        self.preview_address = "10.98.0.81"
-        self.preview_port = 5008
+        self.preview_address = config.RTPDUMP_PREVIEW_ADDRESS
+        self.preview_port = config.RTPDUMP_PREVIEW_PORT
         
         # directories used when saving/previewing files
-        self.sync_dir = "sync"
-        self.dump_dir = os.path.join(self.sync_dir, "dump")
+        self.sync_dir = config.SYNC_DIR
+        self.dump_dir = config.DUMP_DIR
         
         # name/file extension of recorded video files
-        self.video_basename = "_sermon"
-        self.video_file_ext = "dump"
+        self.video_basename = config.VIDEO_BASENAME
+        self.video_file_ext = config.VIDEO_FILE_EXT
         
         # file extension for commit files (they share the video's name)
-        self.commit_file_ext = "commit"
+        self.commit_file_ext = config.COMMIT_FILE_EXT
         
         # maximum time we will wait for a process to complete an action
-        self.max_block_time = 3
+        self.max_block_time = config.MAX_BLOCK_TIME
         
         # replaced with custom function in unit tests
         self.file_exists = os.path.exists

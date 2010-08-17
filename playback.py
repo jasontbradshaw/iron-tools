@@ -7,6 +7,7 @@ import time
 
 import util
 import rtp
+import config
 from it_exceptions import *
 
 class Playback:
@@ -15,13 +16,13 @@ class Playback:
         self.__lock = threading.Lock()
         
         self.rtpplay = rtp.RTPPlay()
-        self.play_address = "127.0.0.1"
-        self.play_port = 5008
+        self.play_address = config.RTPPLAY_ADDRESS
+        self.play_port = config.RTPPLAY_PORT
 
-        self.sync_dir = "sync"
-        self.dump_dir = os.path.join(self.sync_dir, "dump")
+        self.sync_dir = config.SYNC_DIR
+        self.dump_dir = config.DUMP_DIR
         
-        self.max_block_time = 3
+        self.max_block_time = config.MAX_BLOCK_TIME
         
         util.create_dirs(self.sync_dir, self.dump_dir)
 

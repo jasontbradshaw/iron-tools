@@ -9,7 +9,7 @@ import util
 import rtp
 from it_exceptions import *
 
-class Receiver:
+class Playback:
     
     def __init__(self):
         self.__lock = threading.Lock()

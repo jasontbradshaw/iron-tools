@@ -1,54 +1,19 @@
 #!/usr/bin/env python
 
-import os
-import time
 import logging
 
 import flask
-from flask import Flask
 
 import recorder
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
+recorder_obj = recorder.Recorder()
 
 # set up logging
 RECORDER_LOG_FILENAME = "recorder.log"
 logging.basicConfig(filename=RECORDER_LOG_FILENAME, level=logging.NOTSET,
                     format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
 log = logging.getLogger("recorder")
-
-# config variables
-RTPDUMP_ADDRESS = "0.0.0.0"
-RTPDUMP_PORT = 5006
-
-# where dump preview gets sent
-RTPPLAY_PREVIEW_ADDRESS = "10.98.0.81"
-RTPPLAY_PREVIEW_PORT = 5008
-
-# location that gets synced with receivers
-SYNC_DIR = "sync"
-DUMP_DIR = os.path.join(SYNC_DIR, "dump")
-
-# text to include after the time in dumped files
-VIDEO_BASENAME = "_sermon"
-
-recorder_obj = recorder.Recorder()
-
-"""
-Conventions:
-  - Returning the empty JSON object {} signifies success.
-"""
-
-def write_commit_file(filename, t, extension="time"):
-    """
-    Writes the given time to the given dump file name and saves it to the
-    sync directory.
-    """
-
-    log.debug("called write_commit_file(%s, %s, %s)" %
-              (str(filename), str(t), str(extension)))
-    
-    recorder_obj.write_commit_file(filename, t, extension="time")
 
 @app.route("/")
 def index():
@@ -62,7 +27,7 @@ def devinterface():
     A super-simple development interface for simple interaction with the
     application.
     """
-
+    
     html = "Dev Interface<hr />"
     
     # static links we want to link to (those without parameters)
@@ -98,16 +63,16 @@ def stop_record():
 
     try:
         commit_time, elapsed_time, is_recording = recorder_obj.stop_record()
-
+        
         if commit_time == None:
             commit_time = 0
         if elapsed_time == None:
             elapsed_time = 0
-
+        
         return flask.jsonify(seconds_elapsed=elapsed_time,
                              committed_time=commit_time,
                              is_recording=is_recording)
-    except Exception, e: 
+    except Exception, e:
         log.error(str(e))
         return flask.jsonify(error=str(e))
 
@@ -117,18 +82,22 @@ def get_record_status():
     Returns the status of the recording, including elapsed time, whether
     a recording is happending, and what the commit time is set to.
     """
-
-    log.debug("called /get_record_status")
-    commit_time, elapsed_time, is_recording = recorder_obj.get_status()
-
-    if commit_time == None:
-        commit_time = 0
-    if elapsed_time == None:
-        elapsed_time = 0
-
-    return flask.jsonify(seconds_elapsed=elapsed_time,
-                         committed_time=commit_time,
-                         is_recording=is_recording)
+    
+    try:
+        log.debug("called /get_record_status")
+        commit_time, elapsed_time, is_recording = recorder_obj.get_status()
+        
+        if commit_time == None:
+            commit_time = 0
+        if elapsed_time == None:
+            elapsed_time = 0
+            
+        return flask.jsonify(seconds_elapsed=elapsed_time,
+                             committed_time=commit_time,
+                             is_recording=is_recording)
+    except Exception, e:
+        log.error(str(e))
+        return flask.jsonify(error=str(e))
 
 @app.route("/commit_time/<int:t>")
 def commit_time(t):

@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
-import os
 import logging
 
 import flask
 
-import util
-import rtp
 import playback
 
 app = flask.Flask(__name__)
@@ -18,22 +15,6 @@ logging.basicConfig(filename=PLAYBACK_LOG_FILENAME, level=logging.NOTSET,
                     format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
 log = logging.getLogger("playback")
 
-# config variables
-RTPPLAY_ADDRESS = "127.0.0.1"#"10.98.0.81"
-RTPPLAY_PORT = 5008
-
-# directories synced from server
-SYNC_DIR = "sync"
-DUMP_DIR = os.path.join(SYNC_DIR, "dump")
-
-# create sync directories if they don't exist
-try:
-    if not os.path.exists(DUMP_DIR):
-        os.makedirs(DUMP_DIR)
-except OSError:
-    # failing means the directories already exist
-    pass
-
 @app.route("/")
 def index():
     log.debug("called /")
@@ -42,6 +23,10 @@ def index():
 
 @app.route("/dev")
 def devinterace():
+    """
+    A super-simple development interface for simple interaction with the
+    application.
+    """
     
     html = "Dev Interface<hr />"
     

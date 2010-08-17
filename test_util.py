@@ -41,7 +41,7 @@ class UtilTests(unittest.TestCase):
         assert end_time-start_time < 5
 
     def test_blockUntil_base():
-        """
+p        """
         Test basic function of block until, if passes
         should suffice for all other testing via block while
         """
@@ -69,9 +69,8 @@ class UtilTests(unittest.TestCase):
         name = "this_is_a_test"
         ext = "tst"
         file_name = util.generate_file_name(name, ext)
-        assert file_name.endswith(ext)
+        assert file_name.endswith("." + ext)
 
-    #def test_createDirs_base():
-
-#if __name__ == '__main__':
-    
+if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(UtilTests)
+    unittest.TextTestRunner(verbosity=2).run(suite)

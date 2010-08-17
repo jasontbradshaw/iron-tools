@@ -1,9 +1,15 @@
 ﻿#playbackPanel {
     position:relative;
-    z-index:1;
-    height: 600px;
-    overflow: auto;
     padding: 20px;
+}
+
+.buttonPanel {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    background-color: #31262F;
+    border-top: 4px solid #978BAD;
 }
 
 .videoList
@@ -16,8 +22,6 @@
 .videoItem
 {
 	border:1px dotted silver;
-	/*background-color:Black;*/
-	
 }
 
 .filename
@@ -40,14 +44,14 @@
 
 .selected
 {
-	background-color: Gray;
-	color: White;
+	background-color: #644644;
+	color: #fff;
 }
 
 .loaded
 {
-	background-color: #cac3b3;
-	color:White;
+	background-color: #547D48;
+	color: #fff;
 }
 
 .highlight

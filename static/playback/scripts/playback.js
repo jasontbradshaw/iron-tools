@@ -1,5 +1,4 @@
 ﻿var sortedResult;
-var newSelection = false;
 
 function createElement(tag, id, className, text, value)
 {
@@ -72,25 +71,12 @@ function createOrUpdateListItem(item)
 	return element;
 }
 
-function getSelectedItem()
-{
-	return $(".selected");
-}
-
 function getSelectedItemStartTime()
 {
-	var selectedItem = getSelectedItem();
+	var selectedItem = $(".selected");
 	var startTime = $(".startTime", selectedItem).val();
 	return startTime == "true";
 }
-
-function getSelectedItemFileName()
-{
-	var selectedItem = getSelectedItem();
-	var filename = $(".fileName", selectedItem).val();
-	return filename;
-}
-
 
 function populateFileList(data)
 {
@@ -238,7 +224,6 @@ function loadVideo(option)
 {
 	var selectedOption = $(".filename", option).text();
 	var startTime = getSelectedItemStartTime();
-	newSelection = true;
 
 	if (startTime)
 	{
@@ -378,27 +363,25 @@ function getStatusOnComplete(status, callback)
 		if (!String.isNullOrEmpty(status.file))
 		{
 			//disableButton("load");
-			if (newSelection && (status.file == getSelectedItemFileName()))
+			if (selectLoadedOption(status.file))
 			{
-				newSelection = false;
-				if (selectLoadedOption(status.file))
+				if (status.is_playing)
 				{
-					if (status.is_playing)
-					{
-						disableButton("play");
-						enableButton("stop");
-					}
-					else
-					{
-						disableButton("stop");
-						enableButton("play");
-					}
+					disableButton("play");
+					enableButton("stop");
 				}
 				else
 				{
-					videoListOnChange();
+					disableButton("stop");
+					enableButton("play");
 				}
 			}
+			else
+			{
+				videoListOnChange();
+			}
+			//$("#videoList")[0].disabled = true;
+			//displayStatusMessage("Video playback started successfully", false);
 		}
 
 		if (callback != null && typeof (callback) == "function")

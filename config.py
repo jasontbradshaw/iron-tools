@@ -10,8 +10,8 @@ SYNC_DIR = "sync"
 DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 MAX_BLOCK_TIME = 3
 
-#Receiver config
-RECEIVER_LOG_FILENAME = "receiver.log"
+#Playback config
+PLAYBACK_LOG_FILENAME = "playback.log"
 RTPPLAY_ADDRESS = "127.0.0.1"
 RTPPLAY_PORT = 5008
 

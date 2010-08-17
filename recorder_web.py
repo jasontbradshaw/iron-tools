@@ -30,6 +30,7 @@ DUMP_DIR = os.path.join(SYNC_DIR, "dump")
 # text to include after the time in dumped files
 VIDEO_BASENAME = "_sermon"
 
+recorder_obj = recorder.Recorder()
 
 """
 Conventions:
@@ -45,7 +46,7 @@ def write_commit_file(filename, t, extension="time"):
     log.debug("called write_commit_file(%s, %s, %s)" %
               (str(filename), str(t), str(extension)))
     
-    recorder.write_commit_file(filename, t, extension="time")
+    recorder_obj.write_commit_file(filename, t, extension="time")
 
 @app.route("/")
 def index():
@@ -77,7 +78,36 @@ def start_record():
     Starts the recording process.
     """
 
-    recorder.start_record()
+    log.debug("called /start_record")
+    try:
+        recorder_obj.start_record()
+        return flask.jsonify()
+    except Exception, e:
+        log.error("start_record: %s" % str(e))
+        return flask.jsonify(error=str(e)) 
+
+@app.route("/stop_record")
+def stop_record():
+    """
+    Stops the recording process and sets the start time back to 'None'.
+    """
+
+    log.debug("called /stop_record")
+
+    try:
+        commit_time, elapsed_time, is_recording = recorder_obj.stop_record()
+
+        if commit_time == None:
+            commit_time = 0
+        if elapsed_time == None:
+            elapsed_time = 0
+
+        return flask.jsonify(seconds_elapsed=elapsed_time,
+                             committed_time=commit_time,
+                             is_recording=is_recording)
+    except Exception, e: 
+        log.error(str(e))
+        return flask.jsonify(error=str(e))
 
 @app.route("/get_record_status")
 def get_record_status():
@@ -87,10 +117,48 @@ def get_record_status():
     """
 
     log.debug("called /get_record_status")
-    status = recorder._get_status()
-    return flask.jsonify(seconds_elapsed=status[1],
-                         committed_time=status[0],
-                         is_recording=status[2])
+    commit_time, elapsed_time, is_recording = recorder_obj.get_status()
+
+    if commit_time == None:
+        commit_time = 0
+    if elapsed_time == None:
+        elapsed_time = 0
+
+    return flask.jsonify(seconds_elapsed=elapsed_time,
+                         committed_time=commit_time,
+                         is_recording=is_recording)
+
+@app.route("/commit_time/<int:t>")
+def commit_time(t):
+    """
+    Sets the current global video start time that gets transmitted to
+    all clients.
+    """
+
+    log.debug("called /commit_time/%d" % t)
+
+    try:
+        recorder_obj.commit_time(t)
+        return flask.jsonify()
+    except Exception, e:
+        log.error(str(e))
+        return flask.jsonify(error=str(e))
+
+@app.route("/play_preview/<int:start_time>")
+@app.route("/play_preview/<int:start_time>/<int:duration>")
+def play_preview(start_time, duration=30):
+    """
+    RTPPlay duration seconds of the current dump starting at time start_time.
+    """
+
+    log.debug("called /play_preview/%d/%d" % (start_time, duration))
+
+    try:
+        recorder_obj.play_preview(start_time, duration)
+        return flask.jsonify()
+    except Exception, e:
+        log.error(str(e))
+        return flask.jsonify(error=str(e))
 
 if __name__ == "__main__":
     app.secret_key = "replace me!"

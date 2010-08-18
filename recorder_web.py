@@ -5,13 +5,14 @@ import logging
 import flask
 
 import recorder
+import config
 
 app = flask.Flask(__name__)
 recorder_obj = recorder.Recorder()
 
 # set up logging
-RECORDER_LOG_FILENAME = "recorder.log"
-logging.basicConfig(filename=RECORDER_LOG_FILENAME, level=logging.NOTSET,
+logging.basicConfig(filename=config.RECORDER_LOG_FILENAME,
+                    level=logging.NOTSET,
                     format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
 log = logging.getLogger("recorder")
 

@@ -5,13 +5,14 @@ import logging
 import flask
 
 import playback
+import config
 
 app = flask.Flask(__name__)
 playback_obj = playback.Playback()
 
 # set up logging
-PLAYBACK_LOG_FILENAME = "playback.log"
-logging.basicConfig(filename=PLAYBACK_LOG_FILENAME, level=logging.NOTSET,
+logging.basicConfig(filename=config.PLAYBACK_LOG_FILENAME,
+                    level=logging.NOTSET,
                     format="%(asctime)s\t%(name)s:%(levelname)s\t%(message)s")
 log = logging.getLogger("playback")
 

@@ -39,10 +39,11 @@
             <div id="previewPanel" class="panel">
                 <div class="panelBody">
                     <h2>Start Time (h:mm:ss)</h2>
-                    <input type="text" id="committedTime" class="time nongay" onfocus="onFocus(this);"
+                    <input type="number" id="committedTime" class="time nongay edit"
+                            onfocus="onFocus(this);"
                         onblur="onBlur(this);" />
                     <h2>Preview Length (seconds)</h2>
-                    <div><input id="duration" class="time nongay"
+                    <div><input id="duration" class="time nongay edit"
                                 type="number" min="0" value="30"
                                 onchange="" /></div>
                     <div id="buttonPanel" class="buttonPanel">

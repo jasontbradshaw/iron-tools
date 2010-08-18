@@ -72,14 +72,11 @@
 	font-weight:bold;
 }
 
-.time.gay {
-}
-
-.time.nongay{
+.time.inputbox{
     width: 100%;
 }
 
-.time.edit {
+.time.editable {
     color: #333;
     border: 4px solid #333;
     background: #eee;

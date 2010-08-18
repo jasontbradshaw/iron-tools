@@ -14,7 +14,7 @@
         <div id="bodyPanel">
             <div id="recordPanel" class="panel">
                 <div class="panelBody">
-                    <div id="elapsedTime" class="time gay">
+                    <div id="elapsedTime" class="time">
                     </div>
                     <div id="buttonPanel" class="buttonPanel">
                             <img id="record" title="Start Recording" class="button"
@@ -39,11 +39,12 @@
             <div id="previewPanel" class="panel">
                 <div class="panelBody">
                     <h2>Start Time (h:mm:ss)</h2>
-                    <input type="number" id="committedTime" class="time nongay edit"
+                    <input type="number" id="committedTime" class="time
+                            inputbox editable"
                             onfocus="onFocus(this);"
                         onblur="onBlur(this);" />
                     <h2>Preview Length (seconds)</h2>
-                    <div><input id="duration" class="time nongay edit"
+                    <div><input id="duration" class="time inputbox editable"
                                 type="number" min="0" value="30"
                                 onchange="" /></div>
                     <div id="buttonPanel" class="buttonPanel">

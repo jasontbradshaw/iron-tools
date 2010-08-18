@@ -9,15 +9,7 @@ class RecorderWebTests(unittest.TestCase):
     def setUp(self):
         self.app = recorder_web.app.test_client()
 
-    def test_root(self):
-        """
-        Asserts starting conditions are correct.
-        """
-        
-        rv = self.app.get('/')
-        assert '/static/recorder/index.html' in rv.data
-        
-    def test_stop(self):
+    def test_2_stop(self):
         """
         See if stopping a playback had the desired effects.
         """
@@ -28,19 +20,16 @@ class RecorderWebTests(unittest.TestCase):
         assert js['committed_time'] == 0
         assert js['is_recording'] == False   
     
-    def test_record(self):
+    def test_3_record(self):
         """
         Try to start something twice.
         """
         
         rv = self.app.get('/start_record')
-        assert '{}' in rv.data
-
-        rv = self.app.get('/start_record')
         js = json.loads(rv.data)
-        assert js['warning'] == "rtpdump already running."
+        assert 'error' in js
 
-    def test_elapsed_time(self):
+    def test_4_elapsed_time(self):
         """
         Make sure elapsed time is being tracked properly.
         """
@@ -65,7 +54,7 @@ class RecorderWebTests(unittest.TestCase):
         t2 = int(js['seconds_elapsed'])
         assert 3 <= t2 - t1 <= 4    # close enough
     
-    def test_commit_nostart(self):
+    def test_5_commit_nostart(self):
         """
         Make sure we can't commit a time until at least one recordin has
         been started.
@@ -78,7 +67,7 @@ class RecorderWebTests(unittest.TestCase):
         print len(js)
         #assert "error" in js
     
-    def test_commit_basic(self):
+    def test_6_commit_basic(self):
         """
         Does committing a time work?
         """
@@ -99,17 +88,7 @@ class RecorderWebTests(unittest.TestCase):
         assert 'committed_time' in js
         assert int(js['committed_time']) == 98765
         
-    def test_play_preview_initial(self):
-        """
-        Try various NZP commit time values.
-        """
-        
-        rv = self.app.get('/play_preview/30')
-        js = json.loads(rv.data)
-        assert 'error' in js
-        assert js['error'] == "no recording started, unable to preview."
-
-    def test_stop_end_state(self):
+    def test_8_stop_end_state(self):
         """
         Checks the changes to the record status caused by /stop_record
         """
@@ -125,7 +104,7 @@ class RecorderWebTests(unittest.TestCase):
         js = json.loads(rv.data)
         assert js['committed_time'] == 0
 
-    def test_start_state_change(self):
+    def test_9_start_state_change(self):
         """
         Checks that start_record changes status correctly
         """

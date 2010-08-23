@@ -1,53 +1,53 @@
 ﻿.panel.playback {
-    position:relative;
-    padding: 20px;
-    margin-bottom: 150px;
+  position:relative;
+  padding: 20px;
+  margin-bottom: 150px;
 }
 
 .buttonPanel {
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    background-color: #31262F;
-    border-top: 4px solid #978BAD;
-    opacity: 0.9;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  background-color: #31262F;
+  border-top: 4px solid #978BAD;
+  opacity: 0.9;
 }
 
 .videoList {
 }
 
 .videoItem {
-	border:1px dotted silver;
+  border:1px dotted silver;
 }
 
 .filename {
-	font-weight:bold;
-	font-size:30px;
+  font-weight:bold;
+  font-size:30px;
 }
 
 .startTime, .fileSize {
-	font-style:italic;
-	font-size:30px;
-	padding-left:10px;
+  font-style:italic;
+  font-size:30px;
+  padding-left:10px;
 }
 
 .startTimeMissing {
-	color: #BF4570;
+  color: #BF4570;
 }
 
 .selected {
-	background-color: #644644;
-	color: #fff;
+  background-color: #644644;
+  color: #fff;
 }
 
 .loaded {
-	background-color: #547D48;
-	color: #fff;
+  background-color: #547D48;
+  color: #fff;
 }
 
 .highlight {
-	background-color: #D6C5E7;
-	color: Black;
+  background-color: #D6C5E7;
+  color: Black;
 }
 

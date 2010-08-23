@@ -28,7 +28,7 @@ function createElement(tag, id, className, text, value)
 
 function getStartTimeMessage(startTime)
 {
-  var startTimeMessage = startTime ? (startTimeMessage + " seconds") : "Not Received";
+  var startTimeMessage = startTime ? (startTime + " seconds") : "Not Received";
 	return "Start Time: " + startTimeMessage;
 }
 
@@ -65,17 +65,20 @@ function createOrUpdateListItem(item)
 	}
 
 	element.append(createElement("div", null, "filename", item.filename, item.filename));
-	var startTimeStyle = item.start_time == null ? "" : "startTimeMissing ";
+	var startTimeStyle = item.start_time_received ? "" : "startTimeMissing ";
 	startTimeStyle = startTimeStyle + "startTime";
-  
-  var start_time;
-  if(item.start_time == null) {
-    start_time = null;
-  } else {
-    start_time = item.start_time;
+
+  var startTimeMessage = "Start time: ";
+  if(item.start_time_received)
+  {
+    startTimeMessage += item.start_time + " seconds";
+  }
+  else
+  {
+    startTimeMessage += "Not Received";
   }
 
-	element.append(createElement("div", null, startTimeStyle, getStartTimeMessage(item.start_time), item.start_time.toString()));
+	element.append(createElement("div", null, startTimeStyle, startTimeMessage, item.start_time_received.toString()));
 	element.append(createElement("div", null, "fileSize", getFileSizeMessage(item.file_size), item.file_size));
 	return element;
 }

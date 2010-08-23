@@ -75,6 +75,8 @@ def get_file_list(extension="time"):
         d = {"filename": file_name,
              "start_time_received": commit_time is not None,
              "file_size": file_size}
+        if commit_time:
+            d["start_time"] = commit_time
         
         formatted_list.append(d)
     

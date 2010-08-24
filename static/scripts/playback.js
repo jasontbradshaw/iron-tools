@@ -28,7 +28,7 @@ function createElement(tag, id, className, text, value)
 
 function getStartTimeMessage(startTime)
 {
-	var startTimeMessage = startTime ? "Receieved" : "Not Received";
+	var startTimeMessage = startTime ? startTime : "Not Received";
 	return "Start Time: " + startTimeMessage;
 }
 
@@ -65,9 +65,12 @@ function createOrUpdateListItem(item)
 	}
 
 	element.append(createElement("div", null, "filename", item.filename, item.filename));
-	var startTimeStyle = item.start_time_received ? "" : "startTimeMissing ";
+	var startTimeStyle = item.start_time ? "" : "startTimeMissing ";
 	startTimeStyle = startTimeStyle + "startTime";
-	element.append(createElement("div", null, startTimeStyle, getStartTimeMessage(item.start_time_received), item.start_time_received.toString()));
+
+  if(item.start_time == null) {
+  }
+	element.append(createElement("div", null, startTimeStyle, getStartTimeMessage(item.start_time), ""));
 	element.append(createElement("div", null, "fileSize", getFileSizeMessage(item.file_size), item.file_size));
 	return element;
 }

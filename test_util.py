@@ -3,56 +3,68 @@ import unittest
 import time
 
 class UtilTests(unittest.TestCase):
-    
-    def test_blockWhile_base():
+
+    def setUp(self):
+        self.max_time = 1
+        self.short_time = 0.05
+
+    def test_blockWhile_base(self):
         """
         Test basic use case function of block while
         """
 
         start_time = time.time()
-        util.block_while(true, 5)
+        f = lambda: True
+        result = util.block_while(f, self.max_time)
         end_time = time.time()
 
-        assert end_time-start_time > 5
-
+        assert end_time-start_time >= self.max_time
+        assert not result
+	
         start_time = time.time()
-        lambda(x): x + 1 > time.time()
-        util.block_while(lambda(start_time), 5)
+        f = lambda: start_time + self.short_time > time.time()
+        result = util.block_while(f, self.max_time)
         end_time = time.time()
 
-        assert end_time-start_time < 5
+        assert end_time-start_time < self.max_time
+        assert result
 
-    def test_blockWhile_invert():
+    def test_blockWhile_invert(self):
         """
         Test basic function of block while
         """
 
         start_time = time.time()
-        lambda(x): x + 1 > time.time()
-        util.block_while(lambda(start_time), 5, true)
+        f = lambda: True
+        result = util.block_while(f, self.max_time, True)
         end_time = time.time()
 
-        assert end_time-start_time > 5
-
+        assert end_time-start_time < self.max_time
+        assert result
+	
         start_time = time.time()
-        util.block_while(false, 5, true)
+        f = lambda: start_time + self.short_time < time.time()
+        result = util.block_while(f, self.max_time, True)
         end_time = time.time()
 
-        assert end_time-start_time < 5
+        assert end_time-start_time >= self.max_time
+        assert not result
 
-    def test_blockUntil_base():
-p        """
+    def test_blockUntil_base(self):
+        """
         Test basic function of block until, if passes
         should suffice for all other testing via block while
         """
 
         start_time = time.time()
-        util.block_until(false, 5, true)
+        f = lambda: False
+        result = util.block_while(f, self.max_time)
         end_time = time.time()
 
-        assert end_time-start_time < 5
+        assert end_time-start_time < self.max_time
+        assert result
 
-    def test_generateFileName_base():
+    def test_generateFileName_base(self):
         """
         Tests proper file name generations
         """
@@ -61,7 +73,7 @@ p        """
         file_name = util.generate_file_name(name)
         assert file_name.count(name) > 0
 
-    def test_generateFileName_ext():
+    def test_generateFileName_ext(self):
         """
         Tests use of the extension variable
         """

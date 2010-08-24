@@ -11,58 +11,60 @@
     <div class="main">
         <div id="statusPanel" class="status" style="display: none">
         </div>
-        <div id="bodyPanel">
+        <div id="bodyPanel" style="display: none;">
             <div id="recordPanel" class="panel">
-                <div class="panelBody">
-                    <div id="elapsedTime" class="time gay">
-                    </div>
-                    <div id="buttonPanel" class="buttonPanel">
-                            <img id="record" title="Start Recording" class="button"
-                                    src="static/images/red/record.png"
-                                normalsrc="static/images/red/record.png"
-                                onmouseoversrc="static/images/blue-hot/record.png"
-                                onmousedownsrc="static/images/red/record.png"
-                                disabledsrc="static/images/white/record.png"
-                            onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                            onclick="startRecording(this)" />
-                            <img id="stop" title="Stop Recording" class="button"
-                                    src="static/images/blue/stop.png"
-                                normalsrc="static/images/blue/stop.png"
-                                onmouseoversrc="static/images/blue-hot/stop.png"
-                                onmousedownsrc="static/images/red/stop.png"
-                                disabledsrc="static/images/white/stop.png"
-                            onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                            onclick="stopRecording(this)" />
-                    </div>
+                <div id="elapsedTime" class="time">
+                </div>
+                <div class="buttonPanel">
+                    <img id="record" title="Start Recording" class="button"
+                        src="static/images/red/record.png"
+                        normalsrc="static/images/red/record.png"
+                        onmouseoversrc="static/images/blue-hot/record.png"
+                        onmousedownsrc="static/images/red/record.png"
+                        disabledsrc="static/images/white/record.png"
+                        onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                        onclick="startRecording(this)" />
+                    <img id="stop" title="Stop Recording" class="button"
+                        src="static/images/blue/stop.png"
+                        normalsrc="static/images/blue/stop.png"
+                        onmouseoversrc="static/images/blue-hot/stop.png"
+                        onmousedownsrc="static/images/red/stop.png"
+                        disabledsrc="static/images/white/stop.png"
+                        onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
+                        onclick="stopRecording(this)" />
                 </div>
             </div>
             <div id="previewPanel" class="panel">
-                <div class="panelBody">
-                    <h2>Start Time (h:mm:ss)</h2>
-                    <input type="text" id="committedTime" class="time nongay" onfocus="onFocus(this);"
-                        onblur="onBlur(this);" />
-                    <h2>Preview Length (seconds)</h2>
-                    <div><input id="duration" class="time nongay"
-                                type="number" min="0" value="30"
-                                onchange="" /></div>
-                    <div id="buttonPanel" class="buttonPanel">
-                        <img id="preview" title="Preview" class="button"
-                                src=static/images/blue/play.png"
-                            normalsrc="static/images/blue/play.png"
-                            onmouseoversrc="static/images/blue-hot/play.png"
-                            onmousedownsrc="static/images/red/play.png"
-                            disabledsrc="static/images/white/play.png"
-                            onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                            onclick="previewPlayback(this)" />
-                        <img id="save" title="Save Start Time" class="button"
-                                src="static/images/blue/save-rotated.png"
-                            normalsrc="static/images/blue/save-rotated.png"
-                            onmouseoversrc="static/images/blue-hot/save-rotated.png"
-                            onmousedownsrc="static/images/red/save-rotated.png"
-                            disabledsrc="static/images/white/save-rotated.png"
-                            onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                            onclick="saveStartTime(this)" />
-                    </div>
+                <h2>Start Time (h:mm:ss)</h2>
+                <input type="number" id="committedTime"
+                       class="time inputbox editable"
+                       onfocus="onFocus(this);"
+                       onblur="onBlur(this);" />
+                <h2>Preview Length (seconds)</h2>
+                <input id="duration" class="time inputbox editable"
+                            type="number" min="0" value="30"
+                            onchange="" />
+                <div class="buttonPanel">
+                    <img id="preview" title="Preview" class="button"
+                        src=static/images/blue/play.png"
+                        normalsrc="static/images/blue/play.png"
+                        onmouseoversrc="static/images/blue-hot/play.png"
+                        onmousedownsrc="static/images/red/play.png"
+                        disabledsrc="static/images/white/play.png"
+                        onmouseover="buttonOnMouseOver()"
+                        onmousedown="buttonOnMouseDown()"
+                        onmouseout="buttonOnMouseOut()"
+                        onclick="previewPlayback(this)" />
+                    <img id="save" title="Save Start Time" class="button"
+                        src="static/images/blue/save-rotated.png"
+                        normalsrc="static/images/blue/save-rotated.png"
+                        onmouseoversrc="static/images/blue-hot/save-rotated.png"
+                        onmousedownsrc="static/images/red/save-rotated.png"
+                        disabledsrc="static/images/white/save-rotated.png"
+                        onmouseover="buttonOnMouseOver()"
+                        onmousedown="buttonOnMouseDown()"
+                        onmouseout="buttonOnMouseOut()"
+                        onclick="saveStartTime(this)" />
                 </div>
             </div>
         </div>

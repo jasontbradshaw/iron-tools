@@ -4,6 +4,8 @@
 * -v         verbose
 * -T         use absolute time rather than RTP timestamps
 * -w         wait for a keypress before beginning playback
+* -t         delay seconds after an unsucceful read and try again
+* -x         tail the input--start at the end of the input source
 * -f         file to read
 * -b         begin time
 * -e         end time
@@ -51,6 +53,8 @@ static int verbose = 0;        /* be chatty about packets sent */
 static int verbose_interval = 0; /* counter for when to print verbose message */
 static int wallclock = 0;      /* use wallclock time rather than timestamps */
 static int wait_start = 0;     /* wait for a keypress before beginning playback */
+static int delay_failed_read = 0; /* ms to wait after a failed read before trying again */
+static int start_at_end = 0;   /* start at the end of the input stream and delay until more data is available */
 static u_int32 begin = 0;      /* time of first packet to send */
 static u_int32 end = UINT_MAX; /* when to stop sending */ 
 static FILE *in;               /* input file */
@@ -100,7 +104,7 @@ static double period[128] = {  /* ms per timestamp difference */
 static void usage(char *argv0)
 {
   fprintf(stderr,
-"Usage: %s [-v] [-T] [-w] [-p profile] [-f file] [-b begin time] [-e end time] \
+"Usage: %s [-v] [-T] [-t] [-x] [-w] [-p profile] [-f file] [-b begin time] [-e end time] \
 [-s localport] destination/port[/ttl]\n",
   argv0);
   exit(1);
@@ -187,9 +191,20 @@ static Notify_value play_handler(Notify_client client)
     if (!buffer[rp].p.hdr.length) break;
   }
 
+  /* If we were told to start at the end of the file. */
+  if (first < 0 && start_at_end == 1) {
+    struct timeval delay_holder;
+    delay_holder.tv_usec=0;
+    delay_holder.tv_sec=0;
+    /* Get packets until one of them returns a delay time */
+    do {
+      RD_read(in, &buffer[rp], delay_failed_read, verbose, &delay_holder);
+    } while(delay_holder.tv_usec==0 && delay_holder.tv_sec==0);
+  }
+
   /* Get next packet; try again if we haven't reached the begin time. */
   do {
-    if (RD_read(in, &buffer[rp]) == 0) return NOTIFY_DONE;
+    if (RD_read(in, &buffer[rp], delay_failed_read, verbose, &start) == 0) return NOTIFY_DONE;
   } while (buffer[rp].p.hdr.offset < begin);
 
   /* 
@@ -206,7 +221,6 @@ static Notify_value play_handler(Notify_client client)
   if (first < 0 && wait_start == 1) {
     if (verbose)
       printf("Press enter to begin playback.\n");
-    
     getc(stdin);
   }
 
@@ -326,7 +340,7 @@ int main(int argc, char *argv[])
   in = stdin; /* Changed below if -f specified */
 
   /* parse command line arguments */
-  while ((c = getopt(argc, argv, "b:e:f:p:Tws:vh")) != EOF) {
+  while ((c = getopt(argc, argv, "b:e:f:p:Twt:xs:vh")) != EOF) {
     switch(c) {
     case 'b':
       begin = atof(optarg) * 1000;
@@ -349,6 +363,12 @@ int main(int argc, char *argv[])
     case 'w':
       wait_start = 1;
       break;
+    case 't':
+      delay_failed_read = atof(optarg) * 1000.0;
+      break;
+    case 'x':
+      start_at_end = 1;
+      break;
     case 's':  /* locked source port */
       sourceport = atoi(optarg);
       break;
@@ -363,6 +383,11 @@ int main(int argc, char *argv[])
   }
 
 //  ftell(in);
+
+  if (start_at_end == 1 && delay_failed_read == 0) {
+    printf("Tail (-x) requires delay time (-t)\n");
+    exit(1);
+  }
 
   if (optind < argc) {
     int result=hpt(argv[optind], (struct sockaddr *)&sin, &ttl);

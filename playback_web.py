@@ -73,7 +73,7 @@ def get_file_list(extension="time"):
     formatted_list = []
     for file_name, commit_time, file_size in results:
         d = {"filename": file_name,
-             "start_time_received": commit_time is not None,
+             "start_time": commit_time,
              "file_size": file_size}
         
         formatted_list.append(d)
@@ -128,4 +128,4 @@ def get_status():
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"
-    app.run(host="0.0.0.0", port=5082, debug=True)
+    app.run(host=config.PLAYBACK_HOST, port=config.PLAYBACK_PORT, debug=True)

@@ -1,97 +1,83 @@
-﻿body
-{
-    font-family:Verdana;
-    font-size:100%;
-    background-color: #333333;
-    /*background-color: #EDEDED;*/
-    background-color: #31262F;
-    color: #978BAD;
-	/*color: #817694;*/
+﻿body {
+  font-family: Arial;
+  font-size: 20px;
+  background-color: #333333;
+  background-color: #31262F;
+  color: #978BAD;
+  padding: 0;
+  margin: 0;
 }
 
 h2 {
-    margin-top: 0px;
-    margin-left: 14px;
-    margin-bottom: 0px;
-    font-size: 200%;
-    font-weight: normal;
+  margin-top: 0px;
+  margin-left: 14px;
+  margin-bottom: 0px;
+  font-size: 30px;
+  font-weight: normal;
 }
 
 .main {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 
-.button
-{
-	height:160px;
-	width:160px;
-    margin-left: -8px;
-    margin-right: -4px;
-    padding: 0px;
+.button {
+  height:120px;
+  width:120px;
+  margin-left: -16px;
+  margin-right: -4px;
+  padding: 10px 0 0 0;
 }
 
-.panel
-{
-    /*background-color: #EDEDED;*/
-    background-color: #595265;
-    /*border: 2px solid #BEDB89;*/
-    border: 2px solid #817694;
-	clear:left;	
-	margin: 40px 20px;
-	padding: 14px 10px;
-    /*width: 310px;*/
+.panel {
+  background-color: #595265;
+  border: 2px solid #817694;
+  clear:left;	
+  margin: 40px 20px;
+  padding: 14px 10px;
 
-    -moz-border-radius: 20px;
-    -webkit-border-radius: 20px;
-    -khtml-border-radius: 20px;
-    border-radius: 20px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -khtml-border-radius: 20px;
+  border-radius: 20px;
 }
 
-.panelTitle
-{
-	float:left;
-	clear:left;
-	margin:0px 5px;
-	font-size: 100%;
-	font-weight:bold;
-	background-color:white;
-	position:relative;
-	top:-22px;
-	/*margin:0px 5px -10px 5px;*/
-	padding:0px 2px;
+.panelTitle {
+  float:left;
+  clear:left;
+  margin:0px 5px;
+  font-size: 100%;
+  font-weight:bold;
+  background-color:white;
+  position:relative;
+  top:-22px;
+  padding:0px 2px;
 }
 
-.panelBody
-{
+.panelBody { }
+
+.status {
+  font-size: 300%;
+  background-color: #fff;
+  width: 100%;
+  text-align:center;
+  z-index: 2;
+  padding: 10px;
 }
 
-.status
-{
-    font-size: 300%;
-    background-color: #fff;
-    width: 100%;
-	text-align:center;
-    z-index: 2;
-    padding: 10px;
+.statusError {
+  background-color: #BF4570;
 }
 
-.statusError
-{
-	background-color: #BF4570;
+.hidden {
+  display:none;
+  visibility:hidden;
 }
 
-.hidden
-{
-    display:none;
-    visibility:hidden;
-}
-
-.visible
-{
-    display:inherit;
-    visibility:visible;
+.visible {
+  display:inherit;
+  visibility:visible;
 }
 

@@ -1,62 +1,53 @@
-﻿#playbackPanel {
-    position:relative;
-    padding: 20px;
+﻿.panel.playback {
+  position:relative;
+  padding: 20px;
+  margin-bottom: 150px;
 }
 
 .buttonPanel {
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    background-color: #31262F;
-    border-top: 4px solid #978BAD;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  background-color: #31262F;
+  border-top: 4px solid #978BAD;
+  opacity: 0.9;
 }
 
-.videoList
-{
-	/*border: 4px solid #817694;*/
-	/*height:250px;*/
-	/*overflow:scroll;*/
+.videoList {
 }
 
-.videoItem
-{
-	border:1px dotted silver;
+.videoItem {
+  border:1px dotted silver;
 }
 
-.filename
-{
-	font-weight:bold;
-	font-size:30px;
+.filename {
+  font-weight:bold;
+  font-size:30px;
 }
 
-.startTime, .fileSize
-{
-	font-style:italic;
-	font-size:30px;
-	padding-left:10px;
+.startTime, .fileSize {
+  font-style:italic;
+  font-size:30px;
+  padding-left:10px;
 }
 
-.startTimeMissing
-{
-	color: #BF4570;
+.startTimeMissing {
+  color: #BF4570;
 }
 
-.selected
-{
-	background-color: #644644;
-	color: #fff;
+.selected {
+  background-color: gold;
+  color: #333;
 }
 
-.loaded
-{
-	background-color: #547D48;
-	color: #fff;
+.loaded {
+  background-color: #547D48;
+  color: #fff;
 }
 
-.highlight
-{
-	background-color: #D6C5E7;
-	color: Black;
+.highlight {
+  background-color: #D6C5E7;
+  color: Black;
 }
 

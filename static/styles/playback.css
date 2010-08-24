@@ -37,8 +37,8 @@
 }
 
 .selected {
-  background-color: #B19D55;
-  color: #fff;
+  background-color: gold;
+  color: #333;
 }
 
 .loaded {

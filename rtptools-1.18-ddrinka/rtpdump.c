@@ -807,7 +807,7 @@ int main(int argc, char *argv[])
       }
     }
     else {
-      len = RD_read(in, &packet);
+      len = RD_read(in, &packet, 0, verbose, 0);
       if (len == 0) exit(0);
       now.tv_sec = packet.p.hdr.offset / 1000.;
       now.tv_usec = (packet.p.hdr.offset % 1000) * 1000;

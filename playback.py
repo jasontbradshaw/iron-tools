@@ -32,7 +32,7 @@ class Playback:
         self.file_getsize = os.path.getsize
         self.listdir = os.listdir
         
-    def _load_commit_time(self, filename, extension="time"):
+    def _load_commit_time(self, filename, extension=config.COMMIT_FILE_EXT):
         """
         Loads a commit time from a file and return it as an integer.
         

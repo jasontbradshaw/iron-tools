@@ -180,7 +180,7 @@ class PlaybackTests(unittest.TestCase):
         assert armed_file is None
         assert not is_playing
     
-    def testLivePreviewBeforeArm(self):
+    def testStartLiveBeforeArm(self):
         armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
@@ -188,6 +188,74 @@ class PlaybackTests(unittest.TestCase):
         
         self.assertRaises(InvalidOperationError,
                           self.r.play_live, "127.0.0.1", 0)
+
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file is None
+        assert not is_playing
+        assert not is_live_playing
+    
+    def testStartLiveTwice(self):
+        self.no_side_effects()
+        self.r._load_commit_time = lambda filename: 333
+        self.r.rtpplay.file_exists = lambda f : True
+        self.r.rtpplay_live.file_exists = lambda f : True
+        
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file is None
+        assert not is_playing
+        assert not is_live_playing
+        
+        self.r.arm("test.file")
+        self.r.play_live("127.0.0.1", 0)
+        
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file == "test.file"
+        assert not is_playing
+        assert is_live_playing
+        
+        self.assertRaises(InvalidOperationError,
+                          self.r.play_live, "127.0.0.1", 0)
+    
+    def testStopLiveBeforeAnything(self):
+        self.no_side_effects()
+
+        self.r.stop_live()
+
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file is None
+        assert not is_playing
+        assert not is_live_playing
+
+    def testStopLiveTwiceBeforeAnything(self):
+        self.no_side_effects()
+
+        self.r.stop_live()
+        self.r.stop_live()
+
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file is None
+        assert not is_playing
+        assert not is_live_playing
+
+    def testStopLive(self):
+        self.no_side_effects()
+        self.r._load_commit_time = lambda filename: 333
+        self.r.rtpplay.file_exists = lambda f : True
+        self.r.rtpplay_live.file_exists = lambda f : True
+        
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file is None
+        assert not is_playing
+        assert not is_live_playing
+        
+        self.r.arm("test.file")
+        self.r.play_live("127.0.0.1", 0)
+        self.r.stop_live()
+
+        armed_file, is_playing, is_live_playing = self.r.get_status()
+        assert armed_file is "test.file"
+        assert not is_playing
+        assert not is_live_playing
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(PlaybackTests)

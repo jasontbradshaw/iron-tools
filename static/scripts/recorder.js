@@ -11,7 +11,18 @@ is_recording: false,
 committed_time: 0
 }*/
 
-function copyFromElapsedTime() {
+$("body").ready(function () {
+  $("#copyFromElapsedTime").hover(
+    function () {
+      $("#copyFromElapsedTime").addClass("highlightLink");
+    },
+    function () {
+      $("#copyFromElapsedTime").removeClass("highlightLink");
+  });
+});
+
+function copyFromElapsedTime()
+{
   committedTime = $("#committedTime");
 
   committedTime.val(formatSeconds(getElapsedTime()));

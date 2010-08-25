@@ -1,3 +1,13 @@
+.highlightLink {
+  color: #fff;
+}
+
+span#copyFromElapsedTime {
+  float: right;
+  cursor: pointer;
+  font-size: 32px;
+}
+
 .buttonPanel {
   margin: -15px 0px 0px 0px;
 }

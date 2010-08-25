@@ -181,7 +181,7 @@ class PlaybackTests(unittest.TestCase):
         assert not is_playing
     
     def testLivePreviewBeforeArm(self):
-        armed_file, is_playing, is_live_playing, self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
         assert not is_live_playing

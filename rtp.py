@@ -94,11 +94,12 @@ class RTPPlay(RTPTools):
                     
                     if wait_start:
                         args.append("-w")
-
-                # NOTE: in rtpplay end_wait_time will not work without use_network_timestamp
+                
+                # NOTE: in rtpplay end_wait_time will not work without
+                # use_network_timestamp
                 if end_wait_time:
                     args.extend(["-t", str(end_wait_time)])
-
+                
                 if use_network_timestamp:
                     args.push("-T")
                 
@@ -168,13 +169,14 @@ class RTPPlayEmulator:
         self.file_exists = os.path.exists
 
     def start(self, inputfile, address, port, start_time=None, end_time=None,
-              wait_start=False):
+              wait_start=False, skip_to_end=False, end_wait_time=None,
+              use_network_timestamp=True):
         if not self.file_exists(inputfile):
             raise IOError("Input file '%s' not found." % inputfile)
 
         self.proc_running = True
         return self.pid()
-
+    
     def stop(self):
         self.proc_running = False
 

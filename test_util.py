@@ -8,7 +8,7 @@ class UtilTests(unittest.TestCase):
         self.max_time = 1
         self.short_time = 0.05
 
-    def test_blockWhile_base(self):
+    def testBlockWhileBase(self):
         """
         Test basic use case function of block while
         """
@@ -29,7 +29,8 @@ class UtilTests(unittest.TestCase):
         assert end_time-start_time < self.max_time
         assert result
 
-    def test_blockWhile_invert(self):
+    '''
+    def testBlockWhileInvert(self):
         """
         Test basic function of block while
         """
@@ -49,8 +50,9 @@ class UtilTests(unittest.TestCase):
 
         assert end_time-start_time >= self.max_time
         assert not result
+    '''
 
-    def test_blockUntil_base(self):
+    def testBlockUntilBase(self):
         """
         Test basic function of block until, if passes
         should suffice for all other testing via block while
@@ -64,7 +66,7 @@ class UtilTests(unittest.TestCase):
         assert end_time-start_time < self.max_time
         assert result
 
-    def test_generateFileName_base(self):
+    def testGenerateFileNameBase(self):
         """
         Tests proper file name generations
         """
@@ -73,7 +75,7 @@ class UtilTests(unittest.TestCase):
         file_name = util.generate_file_name(name)
         assert file_name.count(name) > 0
 
-    def test_generateFileName_ext(self):
+    def testGenerateFileNameExt(self):
         """
         Tests use of the extension variable
         """

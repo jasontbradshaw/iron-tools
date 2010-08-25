@@ -159,7 +159,7 @@ class Playback:
                                start_time=commit_time, wait_start=True)
             
             # block for a bit until the process starts
-            if not util.block_until(self.rtpplay.isalive, 3):
+            if not util.block_until(self.rtpplay.isalive, self.max_block_time):
                 msg = "rtpplay did not start in the given amount of time."
                 raise ProcessOperationTimeoutError(msg)
             
@@ -183,19 +183,33 @@ class Playback:
             # mark playback as started
             self._is_playing = True
     
-    def play_live(self, ip, port):
+    def play_live(self, ip, port, end_wait_time=1):
+        """
+        Plays a live preview of the current or last armed/playing file to
+        the given ip address and port.
+        """
+        
         with self.__lock:
             # warn if rtpplay is not yet running
-            if not self.rtpplay_live.isalive():
-                msg = "rtpplay not running, could not begin playback."
+            if self.rtpplay_live.isalive():
+                msg = "live rtpplay already running, not starting playback."
                 raise InvalidOperationError(msg)
             
-            # attempt to play the given file
-            self.rtpplay.start(path, ip, port,
-                               start_time=commit_time, wait_start=False)
-
-            # send the signal to start playback
-            self.rtpplay_live.begin_playback()
+            # make sure we've been given a file to play
+            if self.armed_file is None:
+                msg = "no file to view live, arm and/or play a file first."
+                raise InvalidOperationError(msg)
+            
+            # attempt to play the current file
+            self.rtpplay_live.start(self.armed_file, ip, port,
+                                    skip_to_end=True,
+                                    end_wait_time=end_wait_time)
+            
+            # block for a bit until the process starts
+            if not util.block_until(self.rtpplay_live.isalive,
+                                    self.max_block_time):
+                msg = "rtpplay did not start in the given amount of time."
+                raise ProcessOperationTimeoutError(msg)
             
             # mark playback as started
             self._is_live_playing = True
@@ -206,4 +220,4 @@ class Playback:
         """
         
         with self.__lock:
-            return self._armed_file, self._is_playing
+            return self._armed_file, self._is_playing, self._is_live_playing

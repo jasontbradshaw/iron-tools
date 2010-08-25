@@ -12,6 +12,7 @@ class PlaybackTests(unittest.TestCase):
     def setUp(self):
         self.r = Playback()
         self.r.rtpplay = rtp.RTPPlayEmulator()
+        self.r.rtpplay_live = rtp.RTPPlayEmulator()
     
     def tearDown(self):
         pass
@@ -178,6 +179,15 @@ class PlaybackTests(unittest.TestCase):
         armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
+    
+    def testLivePreviewBeforeArm(self):
+        armed_file, is_playing, is_live_playing, self.r.get_status()
+        assert armed_file is None
+        assert not is_playing
+        assert not is_live_playing
+        
+        self.assertRaises(InvalidOperationError,
+                          self.r.play_live, "127.0.0.1", 0)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(PlaybackTests)

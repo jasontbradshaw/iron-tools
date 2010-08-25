@@ -11,6 +11,16 @@ is_recording: false,
 committed_time: 0
 }*/
 
+function copyFromElapsedTime() {
+  committedTime = $("#committedTime");
+
+  committedTime.val(formatSeconds(getElapsedTime()));
+  committedTime.attr("uncommitted", true);
+
+  committedTime.removeClass("committedTime");
+  committedTime.addClass("uncommittedTime");
+}
+
 function createResult(seconds_elapsed, is_recording, committed_time)
 {
     var obj = new Object();

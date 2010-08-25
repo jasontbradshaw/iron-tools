@@ -17,7 +17,7 @@ class PlaybackTests(unittest.TestCase):
         pass
 
     def testGetStatus(self):
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 
@@ -40,13 +40,13 @@ class PlaybackTests(unittest.TestCase):
         self.r._load_commit_time = lambda filename: 333
         self.r.rtpplay.file_exists = lambda f : True
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 
         self.r.arm("file.file")
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert not is_playing
 
@@ -57,13 +57,13 @@ class PlaybackTests(unittest.TestCase):
 
         self.r.arm("file.file")
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert not is_playing
 
         self.r.arm("file.file")
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert not is_playing
 
@@ -74,13 +74,13 @@ class PlaybackTests(unittest.TestCase):
 
         self.r.arm("file.file")
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert not is_playing
 
         self.r.arm("new.file")
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "new.file"
         assert not is_playing
 
@@ -99,7 +99,7 @@ class PlaybackTests(unittest.TestCase):
         self.r.arm("file.file")
         self.r.play()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert is_playing
 
@@ -119,13 +119,13 @@ class PlaybackTests(unittest.TestCase):
         self.r.play()
         self.assertRaises(InvalidOperationError, self.r.arm, "new.file")
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert is_playing
 
         self.r.play()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file == "file.file"
         assert is_playing
 
@@ -134,7 +134,7 @@ class PlaybackTests(unittest.TestCase):
 
         self.r.stop()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 
@@ -144,7 +144,7 @@ class PlaybackTests(unittest.TestCase):
         self.r.stop()
         self.r.stop()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 
@@ -156,7 +156,7 @@ class PlaybackTests(unittest.TestCase):
         self.r.arm("test.file")
         self.r.stop()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 
@@ -169,13 +169,13 @@ class PlaybackTests(unittest.TestCase):
         self.r.play()
         self.r.stop()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 
         self.r.stop()
 
-        armed_file, is_playing = self.r.get_status()
+        armed_file, is_playing, is_live_playing = self.r.get_status()
         assert armed_file is None
         assert not is_playing
 

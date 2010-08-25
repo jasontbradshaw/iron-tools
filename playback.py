@@ -196,12 +196,12 @@ class Playback:
                 raise InvalidOperationError(msg)
             
             # make sure we've been given a file to play
-            if self.armed_file is None:
+            if self._armed_file is None:
                 msg = "no file to view live, arm and/or play a file first."
                 raise InvalidOperationError(msg)
             
             # attempt to play the current file
-            self.rtpplay_live.start(self.armed_file, ip, port,
+            self.rtpplay_live.start(self._armed_file, ip, port,
                                     skip_to_end=True,
                                     end_wait_time=end_wait_time)
             

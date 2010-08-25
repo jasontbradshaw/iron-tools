@@ -55,7 +55,8 @@ class RTPPlay(RTPTools):
         self.proc = None
         
     def start(self, inputfile, address, port, start_time=None, end_time=None,
-              wait_start=False):
+              wait_start=False, skip_to_end=False, end_wait_time=None,
+              use_network_timestamp=True):
         """
         Start the rtpplay process with a file to play, an address, a port
         to play to, an optional time to start playing the stream from, and
@@ -63,6 +64,13 @@ class RTPPlay(RTPTools):
         
         If wait_start is True, a call to 'begin_playback' will be neccessary
         to actually start the playback.
+
+        skip_to_end - burn through all packets until we get to end; start
+            playing at end.
+        end_wait_time - if at end of file, interval (in seconds) between checking
+            for new data.
+        use_network_timestamp - replace the RTP timestamp with the the network
+            timestamp.
         """
         
         with self.lock:
@@ -75,14 +83,24 @@ class RTPPlay(RTPTools):
                 args = ["./%s" % self.path,
                         "-f", inputfile]
                 
-                if start_time is not None:
-                    args.extend(["-b", str(start_time)])
-                
-                if end_time is not None:
-                    args.extend(["-e", str(end_time)])
-                
-                if wait_start:
-                    args.append("-w")
+                if skip_to_end:
+                    args.push("-x")
+                else:
+                    if start_time is not None:
+                        args.extend(["-b", str(start_time)])
+                    
+                    if end_time is not None:
+                        args.extend(["-e", str(end_time)])
+                    
+                    if wait_start:
+                        args.append("-w")
+
+                # NOTE: in rtpplay end_wait_time will not work without use_network_timestamp
+                if end_wait_time:
+                    args.extend(["-t", str(end_wait_time)])
+
+                if use_network_timestamp:
+                    args.push("-T")
                 
                 # add address/port string
                 args.extend(["%s/%d" % (address, port)])

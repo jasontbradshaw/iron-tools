@@ -14,6 +14,7 @@ class Playback:
         self.__lock = threading.Lock()
         
         self.rtpplay = rtp.RTPPlay()
+        self.rtpplay_live = rtp.RTPPlay()
         self.play_address = config.RTPPLAY_ADDRESS
         self.play_port = config.RTPPLAY_PORT
 
@@ -26,6 +27,7 @@ class Playback:
 
         self._is_playing = False
         self._armed_file = None
+        self._is_live_playing = False
 
         # replaced with custom function in unit tests
         self.file_exists = os.path.exists
@@ -73,6 +75,18 @@ class Playback:
             # mark playback as stopped
             self._is_playing = False
             self._armed_file = None
+
+    def stop_live(self):
+        with self.__lock:
+            # stop works even on a non-running process
+            self.rtpplay_live.stop()
+            
+            if not util.block_while(self.rtpplay_live.isalive, self.max_block_time):
+                msg = "rtpplay did not terminate in the given amount of time."
+                raise ProcessOperationTimeoutError(msg)
+            
+            # mark playback as stopped
+            self._is_live_playing = False
     
     def get_file_list(self, extension="time"):
         """
@@ -168,6 +182,23 @@ class Playback:
             
             # mark playback as started
             self._is_playing = True
+    
+    def play_live(self, ip, port):
+        with self.__lock:
+            # warn if rtpplay is not yet running
+            if not self.rtpplay_live.isalive():
+                msg = "rtpplay not running, could not begin playback."
+                raise InvalidOperationError(msg)
+            
+            # attempt to play the given file
+            self.rtpplay.start(path, ip, port,
+                               start_time=commit_time, wait_start=False)
+
+            # send the signal to start playback
+            self.rtpplay_live.begin_playback()
+            
+            # mark playback as started
+            self._is_live_playing = True
     
     def get_status(self):
         """

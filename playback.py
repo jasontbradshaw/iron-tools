@@ -41,12 +41,12 @@ class Playback:
         'filename' is the name of a video file founnd in the dump directory.
         """
         
-        dump_file = os.path.join(self.sync_dir, filename + "." + extension)
+        commit_file = os.path.join(self.sync_dir, filename + "." + extension)
         
         # read file time, or 0 if we couldn't
         num = 0
         try:
-            with open(dump_file, 'r') as f:
+            with open(commit_file, 'r') as f:
                 num = int(f.read())
         except OSError:
             num = None
@@ -88,7 +88,7 @@ class Playback:
             # mark playback as stopped
             self._is_live_playing = False
     
-    def get_file_list(self, extension="time"):
+    def get_file_list(self, extension=config.COMMIT_FILE_EXT):
         """
         Returns a list of files found in the dump directory as tuples of:
           (file name, commit_time, file size)
@@ -109,7 +109,6 @@ class Playback:
                 size = self.file_getsize(os.path.join(self.dump_dir, f))
                 
                 # determine if we received a commit time for the file
-                commit_file = os.path.join(self.sync_dir, f + "." + extension)
                 commit_time = self._load_commit_time(f)
                 
                 # add them all to the list as a dict of attributes

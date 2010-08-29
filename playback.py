@@ -159,7 +159,8 @@ class Playback:
             
             # attempt to play the given file
             self.rtpplay.start(path, self.play_address, self.play_port,
-                               start_time=commit_time, wait_start=True)
+                               start_time=commit_time, wait_start=True,
+                               end_wait_time=config.END_WAIT_TIME)
             
             # block for a bit until the process starts
             if not util.block_until(self.rtpplay.isalive, self.max_block_time):

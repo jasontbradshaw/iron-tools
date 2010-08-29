@@ -120,12 +120,12 @@ def get_status():
     log.debug("called /get_status")
     
     try:
-        armed_file, is_playing, is_playing_live = playback_obj.get_status()
+        armed_file, is_playing, is_live_playing = playback_obj.get_status()
     except Exception, e:
         return flask.jsonify(error=str(e))
     
     return flask.jsonify(file=armed_file, is_playing=is_playing,
-            is_playing_live=is_playing_live)
+            is_live_playing=is_live_playing)
 
 if __name__ == "__main__":
     app.secret_key = "replace me as well!"

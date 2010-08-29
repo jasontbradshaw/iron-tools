@@ -384,10 +384,10 @@ function Playback()
       {
         callback();
       }
-      else
-      {
-        displayStatusMessage("Unable to get playback status: " + status.error, true);
-      }
+    }
+    else
+    {
+      displayStatusMessage("Unable to get playback status: " + status.error, true);
     }
   }
 

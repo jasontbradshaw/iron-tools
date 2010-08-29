@@ -7,6 +7,7 @@
     <link rel="Stylesheet" type="text/css" href="static/styles/common.css" />
     <link type="text/css" rel="Stylesheet" href="static/styles/playback.css" />
 </head>
+
 <body>
     <div class="main">
         <div id="statusPanel" class="status" style="display: none">
@@ -17,27 +18,22 @@
                 </div>
             </div>
             <div class="buttonPanel">
-                <img id="play" title="Play Video" class="button"
+                <img id="play" title="Play Video" class="button" 
                     src="static/images/blue/play.png"
                     normalsrc="static/images/blue/play.png"
                     onmouseoversrc="static/images/blue-hot/play.png"
                     onmousedownsrc="static/images/red/play.png"
                     disabledsrc="static/images/white/play.png"
-                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                    onclick="playVideo(this)" />
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()" />
                 <img id="stop" title="Stop Video" class="button"
                     src="static/images/blue/stop.png"
                     normalsrc="static/images/blue/stop.png"
                     onmouseoversrc="static/images/blue-hot/stop.png"
                     onmousedownsrc="static/images/red/stop.png"
                     disabledsrc="static/images/white/stop.png"
-                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()"
-                    onclick="stopVideo(this)" />
+                    onmouseover="buttonOnMouseOver()" onmousedown="buttonOnMouseDown()" onmouseout="buttonOnMouseOut()" />
             </div>
         </div>
-        <script type="text/javascript">
-            initialize();
-        </script>
     </div>
 </body>
 </html>

@@ -3,6 +3,28 @@
     return (value == null || value == "");
 }
 
+if (Array.prototype.indexOf == undefined)
+{
+	Array.prototype.indexOf = function (value)
+	{
+		var i;
+		for (i = 0; i < this.length; i++)
+		{
+			if (this[i] == value)
+			{
+				break;
+			}
+		}
+
+		if (i >= this.length)
+		{
+			i = -1;
+		}
+
+		return i;
+	}
+}
+
 function toggleButton(button, targetState)
 {
     if (!button.disabled)
@@ -145,4 +167,33 @@ function addOption(list, option)
     {
         list.add(option);
     }
+}
+
+
+Math.roundTo = function (value, decimals)
+{
+	var factor = Math.pow(10, decimals);
+	return Math.round(value * factor) / factor;
+}
+
+function ID(val)
+{
+	return "#" + val;
+}
+
+function CLASS(val)
+{
+	return "." + val;
+}
+
+function formatSeconds(seconds)
+{
+	var remainingSeconds = seconds % 60;
+	var minutes = Math.floor(seconds / 60);
+	var remainingMinutes = minutes % 60;
+	var hours = Math.floor(minutes / 60);
+
+	var textMinutes = remainingMinutes < 10 ? "0" + remainingMinutes : remainingMinutes;
+	var textSeconds = remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds;
+	return hours + ":" + textMinutes + ":" + textSeconds;
 }

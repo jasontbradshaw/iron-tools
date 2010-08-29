@@ -71,9 +71,12 @@ function startRecordingOnError(xmlHttpRequest, status, errorThrown)
 
 function stopRecording(stopButton)
 {
-    if (!stopButton.disabled)
-    {
-        getJSON("../../stop_record", null, false, stopRecordingOnComplete, stopRecordingOnError);
+	if (!stopButton.disabled)
+	{
+		if (confirm("Are you sure you want to stop recording?"))
+		{
+			getJSON("../../stop_record", null, false, stopRecordingOnComplete, stopRecordingOnError);
+		}
     }
 }
 
@@ -175,7 +178,7 @@ function checkStatusOnComplete(data, callback)
     }
     else
     {
-        displayStatusMessage("Unable to retrieve record status from server: " + errorThrown, true);
+        displayStatusMessage("Unable to retrieve record status from server: " + data.error, true);
     }
 }
 
@@ -284,18 +287,6 @@ function validateSeconds(seconds)
     }
 
     return { "isValid": validateParts(newParts), "value": joinParts(newParts) };
-}
-
-function formatSeconds(seconds)
-{
-    var remainingSeconds = seconds % 60;
-    var minutes = Math.floor(seconds / 60);
-    var remainingMinutes = minutes % 60;
-    var hours = Math.floor(minutes / 60);
-
-    var textMinutes = remainingMinutes < 10 ? "0" + remainingMinutes : remainingMinutes;
-    var textSeconds = remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds;
-    return hours + ":" + textMinutes + ":" + textSeconds;
 }
 
 function unformatSeconds(formattedTime)

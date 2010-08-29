@@ -88,7 +88,7 @@ class Playback:
             # mark playback as stopped
             self._is_live_playing = False
     
-    def get_file_list(self, extension=config.COMMIT_FILE_EXT):
+    def get_file_list(self):
         """
         Returns a list of files found in the dump directory as tuples of:
           (file name, commit_time, file size)
@@ -97,8 +97,12 @@ class Playback:
         with self.__lock:
             # try to fill the list with files in the given path
             dirlist = []
-            if self.file_exists(self.dump_dir):
-                dirlist = self.listdir(self.dump_dir)
+            if not self.file_exists(self.dump_dir):
+                msg = "dump directory does not exist."
+                raise FileNotFoundError(msg)
+
+            dirlist = self.listdir(self.dump_dir)
+               
             
             # sort directory before returning
             dirlist.sort()

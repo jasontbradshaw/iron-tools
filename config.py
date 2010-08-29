@@ -31,7 +31,7 @@ RTPDUMP_PREVIEW_PORT = 5008
 # recorder strings
 VIDEO_BASENAME = "_sermon"
 VIDEO_FILE_EXT = "dump"
-COMMIT_FILE_EXT = "commit"
+COMMIT_FILE_EXT = "time"
 
 # development environment
 if ENVIRONMENT == ENV_DEV:
@@ -55,7 +55,7 @@ elif ENVIRONMENT == ENV_PRODUCTION:
     RTPDUMP_PREVIEW_ADDRESS = "10.98.0.81"
     RTPDUMP_PREVIEW_PORT = 5008
     
-    SYNC_DIR = "/video/hires/test1"
+    SYNC_DIR = "/video/hi_res/test1"
     DUMP_DIR = os.path.join(SYNC_DIR, "dump")
     
     RECORDER_PORT = 80

@@ -84,7 +84,7 @@ class RTPPlay(RTPTools):
                         "-f", inputfile]
                 
                 if skip_to_end:
-                    args.push("-x")
+                    args.append("-x")
                 else:
                     if start_time is not None:
                         args.extend(["-b", str(start_time)])
@@ -101,7 +101,7 @@ class RTPPlay(RTPTools):
                     args.extend(["-t", str(end_wait_time)])
                 
                 if use_network_timestamp:
-                    args.push("-T")
+                    args.append("-T")
                 
                 # add address/port string
                 args.extend(["%s/%d" % (address, port)])

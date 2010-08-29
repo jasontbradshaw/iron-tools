@@ -56,7 +56,7 @@ class RTPPlay(RTPTools):
         
     def start(self, inputfile, address, port, start_time=None, end_time=None,
               wait_start=False, skip_to_end=False, end_wait_time=None,
-              use_network_timestamp=True):
+              use_network_timestamp=True, verbose=True):
         """
         Start the rtpplay process with a file to play, an address, a port
         to play to, an optional time to start playing the stream from, and
@@ -102,6 +102,9 @@ class RTPPlay(RTPTools):
                 
                 if use_network_timestamp:
                     args.append("-T")
+
+                if verbose:
+                    args.append("-v")
                 
                 # add address/port string
                 args.extend(["%s/%d" % (address, port)])

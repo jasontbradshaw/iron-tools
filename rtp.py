@@ -108,6 +108,8 @@ class RTPPlay(RTPTools):
                 
                 # add address/port string
                 args.extend(["%s/%d" % (address, port)])
+
+                print args
         
                 self.proc = sp.Popen(args, stdin=sp.PIPE)
             

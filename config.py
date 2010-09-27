@@ -1,9 +1,35 @@
+"""
+Configuration file for the Iron Tools system.
+
+================================================================================
+Production
+================================================================================
+    
+    To use production settings, simply have a blank "production.env" file in the
+    same directory as this file.
+
+    Currently, the "production" environment includes the high school and
+    the St. John campus.
+
+================================================================================
+Development
+================================================================================
+
+    By default, the development configurations are used.
+
+"""
 import os
+import os.path
+
+def current_environment():
+    if os.path.exists('production.env'):
+        return ENV_PRODUCTION
+    return ENV_DEV
 
 # environment
 ENV_DEV = "dev"
 ENV_PRODUCTION = "prod"
-ENVIRONMENT = ENV_DEV
+ENVIRONMENT = current_environment()
 
 # flask
 RECORDER_HOST = "0.0.0.0"
@@ -20,6 +46,7 @@ MAX_BLOCK_TIME = 3
 PLAYBACK_LOG_FILENAME = "playback.log"
 RTPPLAY_ADDRESS = "127.0.0.1"
 RTPPLAY_PORT = 5008
+END_WAIT_TIME = 1
 
 # recorder config
 RECORDER_LOG_FILENAME = "recorder.log"
@@ -63,3 +90,4 @@ elif ENVIRONMENT == ENV_PRODUCTION:
 
 else:
     raise NotImplemented("'%s' not a supported environment." % ENVIRONMENT)
+

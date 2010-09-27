@@ -25,7 +25,8 @@ class RTPTools:
         """
         
         if self.isalive():
-            self.proc.terminate()
+            self.proc.kill()
+            self.proc.wait()
     
     def pid(self):
         """
@@ -55,7 +56,7 @@ class RTPPlay(RTPTools):
         self.proc = None
         
     def start(self, inputfile, address, port, start_time=None, end_time=None,
-              wait_start=False, skip_to_end=False, end_wait_time=None,
+              wait_start=False, skip_to_end=False, end_wait_time=1,
               use_network_timestamp=True, verbose=True):
         """
         Start the rtpplay process with a file to play, an address, a port
@@ -95,12 +96,12 @@ class RTPPlay(RTPTools):
                     if wait_start:
                         args.append("-w")
                 
-                # NOTE: in rtpplay end_wait_time will not work without
+                # WARNING: in rtpplay, end_wait_time will not work without
                 # use_network_timestamp
                 if end_wait_time:
                     args.extend(["-t", str(end_wait_time)])
                 
-                if use_network_timestamp:
+                if end_wait_time or use_network_timestamp:
                     args.append("-T")
 
                 if verbose:
@@ -122,7 +123,8 @@ class RTPPlay(RTPTools):
         
         # only kill the process if it's currently alive
         if self.isalive():
-            self.proc.terminate()
+            self.proc.kill()
+            self.proc.wait()
         
     def begin_playback(self):
         """

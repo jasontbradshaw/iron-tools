@@ -24,18 +24,12 @@ def block_while(condition_func, max_time, invert=False):
     invert=True), then returns whether the condition was met before
     the maximum allotted time.
     """
-    
-    end_time = time.time() + max_time
-    
-    # make sure we get a function (something we can call), else this
-    # can fail silently!
-    try:
-        # we just have to attempt to access the attribue, if not there
-        # an exception is raised
-        condition_func.__call__
-    except AttributeError:
+
+    if not hasattr(condition_func, '__call__'):
         msg = "The first argument to a block function must be callable"
         raise AttributeError(msg)
+    
+    end_time = time.time() + max_time
     
     # flip the conditional function's test if specified
     if invert:

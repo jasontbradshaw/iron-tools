@@ -28,7 +28,17 @@ class UtilTests(unittest.TestCase):
 
         assert end_time-start_time < self.max_time
         assert result
-
+    
+    def testBlockRaisesExceptionWhenNotGivenAFunction(self):
+        """
+        Makes sure that block_* throws an exception if if doesn't
+        receive a callable function as its first argument.
+        """
+        
+        # giving these a boolean is a common error
+        self.assertRaises(AttributeError, util.block_while, False, 1)
+        self.assertRaises(AttributeError, util.block_until, False, 1)
+    
     '''
     def testBlockWhileInvert(self):
         """

@@ -124,8 +124,8 @@ class Playback:
     
     def arm(self, file_name):
         """
-        Attempts to play the file argument.  Returns success if it could find
-        the file and was not already playing, otherwise an error.
+        Attempts to play the file argument.  Returns success if it could
+        find the file and was not already playing, otherwise an error.
         """
         
         with self.__lock:
@@ -136,14 +136,19 @@ class Playback:
                 if self._is_playing:
                     msg = "cannot arm a file during playback."
                     raise InvalidOperationError(msg)
-            
+                
                 # same file already armed
                 if file_name == self._armed_file:
                     return
-
+                
                 # kill the old armed process and arm a new one
                 self.rtpplay.stop()
-        
+                if not util.block_while(self.rtpplay.isalive,
+                                        self.max_block_time):
+                    msg = ("rtpplay did not stop in the given amount of "
+                           "time, failed to arm a new file.")
+                    raise ProcessOperationTimeoutError(msg)
+            
             path = os.path.join(self.dump_dir, file_name)
             
             # ensure the file exists
@@ -157,13 +162,15 @@ class Playback:
                 msg = "commit time is required to arm process."
                 raise InvalidOperationError(msg)
             
-            # attempt to play the given file
+            # attempt to arm the given file
             self.rtpplay.start(path, self.play_address, self.play_port,
                                start_time=commit_time, wait_start=True)
             
             # block for a bit until the process starts
-            if not util.block_until(self.rtpplay.isalive, self.max_block_time):
-                msg = "rtpplay did not start in the given amount of time."
+            if not util.block_until(self.rtpplay.isalive,
+                                    self.max_block_time):
+                msg = ("rtpplay did not start in the given amount of "
+                       "time, could not arm file.")
                 raise ProcessOperationTimeoutError(msg)
             
             # save file name for get_status

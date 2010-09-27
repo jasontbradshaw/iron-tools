@@ -24,6 +24,8 @@ def block_while(condition_func, max_time, invert=False):
     invert=True), then returns whether the condition was met before
     the maximum allotted time.
     """
+
+    assert hasattr(condition_func, '__call__')
     
     end_time = time.time() + max_time
     

@@ -27,6 +27,16 @@ def block_while(condition_func, max_time, invert=False):
     
     end_time = time.time() + max_time
     
+    # make sure we get a function (something we can call), else this
+    # can fail silently!
+    try:
+        # we just have to attempt to access the attribue, if not there
+        # an exception is raised
+        condition_func.__call__
+    except AttributeError:
+        msg = "The first argument to a block function must be callable"
+        raise AttributeError(msg)
+    
     # flip the conditional function's test if specified
     if invert:
         term_test = lambda: not condition_func()

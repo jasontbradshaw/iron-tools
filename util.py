@@ -24,7 +24,7 @@ def block_while(condition_func, max_time, invert=False):
     invert=True), then returns whether the condition was met before
     the maximum allotted time.
     """
-
+    
     if not hasattr(condition_func, '__call__'):
         msg = "The first argument to a block function must be callable"
         raise AttributeError(msg)

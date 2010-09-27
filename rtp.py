@@ -24,6 +24,8 @@ class RTPTools:
         Kills the process launched by 'start'.
         """
         
+        # will wait for the process to die, but could possibly wait
+        # forever (see subprocess documenation).
         if self.isalive():
             self.proc.kill()
             self.proc.wait()

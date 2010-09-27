@@ -25,7 +25,8 @@ class RTPTools:
         """
         
         if self.isalive():
-            self.proc.terminate()
+            self.proc.kill()
+            self.proc.wait()
     
     def pid(self):
         """
@@ -122,7 +123,8 @@ class RTPPlay(RTPTools):
         
         # only kill the process if it's currently alive
         if self.isalive():
-            self.proc.terminate()
+            self.proc.kill()
+            self.proc.wait()
         
     def begin_playback(self):
         """

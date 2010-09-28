@@ -21,13 +21,13 @@ class RTPTools:
 
     def stop(self):
         """
-        Kills the process launched by 'start'.
+        Terminate the process launched by 'start'.
         """
         
         # will wait for the process to die, but could possibly wait
         # forever (see subprocess documenation).
         if self.isalive():
-            self.proc.kill()
+            self.proc.terminate()
             self.proc.wait()
     
     def pid(self):
@@ -120,12 +120,12 @@ class RTPPlay(RTPTools):
     
     def stop(self):
         """
-        Kills the process launched by 'start'.
+        Terminates the process launched by 'start'.
         """
         
-        # only kill the process if it's currently alive
+        # only terminate the process if it's currently alive
         if self.isalive():
-            self.proc.kill()
+            self.proc.terminate()
             self.proc.wait()
         
     def begin_playback(self):
